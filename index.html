@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cruce Fotográfico</title>
+  <title>Pendiente RIAL</title>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -20,7 +20,6 @@
       --green: #8fca00;
       --green-dark: #6fa100;
       --blue: #2563eb;
-      --blue-dark: #1d4ed8;
       --red: #dc2626;
       --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
       --radius: 18px;
@@ -35,10 +34,8 @@
       --border: #1e293b;
       --border-strong: #475569;
       --dark: #f8fafc;
-      --green: #8fca00;
       --green-dark: #a3d900;
       --blue: #60a5fa;
-      --blue-dark: #3b82f6;
       --red: #f87171;
       --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
     }
@@ -130,33 +127,16 @@
     .hero {
       background: linear-gradient(135deg, #111827 0%, #1f2937 70%, #314300 100%);
       color: white;
-      padding: 28px;
+      padding: 34px 28px;
       border-radius: 26px;
       box-shadow: var(--shadow);
     }
 
     .hero h1 {
       margin: 0;
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing: -0.05em;
-      line-height: 1.05;
-    }
-
-    .chips {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e5e7eb;
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: clamp(34px, 5vw, 56px);
+      letter-spacing: -0.06em;
+      line-height: 1;
     }
 
     .grid {
@@ -617,25 +597,20 @@
     <div class="brand">
       <div class="brand-icon">F</div>
       <div>
-        Cruce Fotográfico
+        Pendiente RIAL
         <small>Reporte · RIAL</small>
       </div>
     </div>
 
     <div class="header-actions">
-      <div class="version">V0.1.2</div>
+      <div class="version">V0.1.3</div>
       <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <h1>Pendientes fotográficos</h1>
-      <div class="chips">
-        <span class="chip">AMBIENTADO = 0</span>
-        <span class="chip">SKU</span>
-        <span class="chip">modelo_color</span>
-      </div>
+      <h1>Pendiente RIAL</h1>
     </section>
 
     <section class="grid">
@@ -683,8 +658,8 @@
       <section>
         <div class="metrics">
           <div class="metric green">
-            <span>Sobrante</span>
-            <strong id="mSobrante">0</strong>
+            <span>Pendiente de foto RIAL</span>
+            <strong id="mPendienteRial">0</strong>
           </div>
 
           <div class="metric blue">
@@ -707,14 +682,15 @@
               </div>
 
               <div class="download-actions">
-                <button class="btn-green" id="btnDescargarSobrante" disabled>Sobrante</button>
+                <button class="btn-green" id="btnDescargarTodo" disabled>Descargar todo</button>
+                <button class="btn-light" id="btnDescargarPendienteRial" disabled>Pendiente RIAL</button>
                 <button class="btn-light" id="btnDescargarCruzado" disabled>Cruzado</button>
                 <button class="btn-light" id="btnDescargarNoCruzado" disabled>No cruzado</button>
               </div>
             </div>
 
             <div class="tabs">
-              <button class="tab active" data-view="sobrante">Sobrante</button>
+              <button class="tab active" data-view="pendienteRial">Pendiente RIAL</button>
               <button class="tab" data-view="cruzado">Cruzado</button>
               <button class="tab" data-view="noCruzado">No cruzado</button>
             </div>
@@ -738,14 +714,14 @@
     let reporteRows = [];
     let rialRows = [];
 
-    let resultadoSobrante = [];
+    let resultadoPendienteRial = [];
     let resultadoCruzado = [];
     let resultadoNoCruzado = [];
 
     let columnasReporte = {};
     let columnasRial = {};
 
-    let currentView = "sobrante";
+    let currentView = "pendienteRial";
 
     const $ = (id) => document.getElementById(id);
 
@@ -754,7 +730,8 @@
     const btnCruzar = $("btnCruzar");
     const btnLimpiar = $("btnLimpiar");
 
-    const btnDescargarSobrante = $("btnDescargarSobrante");
+    const btnDescargarTodo = $("btnDescargarTodo");
+    const btnDescargarPendienteRial = $("btnDescargarPendienteRial");
     const btnDescargarCruzado = $("btnDescargarCruzado");
     const btnDescargarNoCruzado = $("btnDescargarNoCruzado");
 
@@ -799,8 +776,10 @@
     btnCruzar.addEventListener("click", cruzarReportes);
     btnLimpiar.addEventListener("click", limpiarTodo);
 
-    btnDescargarSobrante.addEventListener("click", () => {
-      descargarExcel(resultadoSobrante, "sobrante");
+    btnDescargarTodo.addEventListener("click", descargarTodo);
+
+    btnDescargarPendienteRial.addEventListener("click", () => {
+      descargarExcel(resultadoPendienteRial, "pendiente_foto_rial");
     });
 
     btnDescargarCruzado.addEventListener("click", () => {
@@ -998,7 +977,7 @@
           }
         });
 
-        resultadoSobrante = [];
+        resultadoPendienteRial = [];
         resultadoCruzado = [];
 
         reporteAmbientado0.forEach((row) => {
@@ -1015,9 +994,9 @@
               SKU_RIAL_ENCONTRADO: Array.from(info.skusRial).join(", ")
             });
           } else {
-            resultadoSobrante.push({
+            resultadoPendienteRial.push({
               ...filaLimpia,
-              ESTADO_CRUCE: "SOBRANTE"
+              ESTADO_CRUCE: "PENDIENTE FOTO RIAL"
             });
           }
         });
@@ -1030,16 +1009,16 @@
           }));
 
         actualizarMetricas({
-          sobrante: resultadoSobrante.length,
+          pendienteRial: resultadoPendienteRial.length,
           cruzado: resultadoCruzado.length,
           noCruzado: resultadoNoCruzado.length
         });
 
         activarDescargas();
 
-        currentView = "sobrante";
+        currentView = "pendienteRial";
         document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-        document.querySelector('[data-view="sobrante"]').classList.add("active");
+        document.querySelector('[data-view="pendienteRial"]').classList.add("active");
 
         renderVistaActual();
 
@@ -1189,23 +1168,30 @@
     }
 
     function actualizarMetricas(data) {
-      $("mSobrante").textContent = data.sobrante.toLocaleString("es-CL");
+      $("mPendienteRial").textContent = data.pendienteRial.toLocaleString("es-CL");
       $("mCruzado").textContent = data.cruzado.toLocaleString("es-CL");
       $("mNoCruzado").textContent = data.noCruzado.toLocaleString("es-CL");
     }
 
     function activarDescargas() {
-      btnDescargarSobrante.disabled = resultadoSobrante.length === 0;
+      const hayDatos =
+        resultadoPendienteRial.length > 0 ||
+        resultadoCruzado.length > 0 ||
+        resultadoNoCruzado.length > 0;
+
+      btnDescargarTodo.disabled = !hayDatos;
+      btnDescargarPendienteRial.disabled = resultadoPendienteRial.length === 0;
       btnDescargarCruzado.disabled = resultadoCruzado.length === 0;
       btnDescargarNoCruzado.disabled = resultadoNoCruzado.length === 0;
     }
 
     function resetResultados() {
-      resultadoSobrante = [];
+      resultadoPendienteRial = [];
       resultadoCruzado = [];
       resultadoNoCruzado = [];
 
-      btnDescargarSobrante.disabled = true;
+      btnDescargarTodo.disabled = true;
+      btnDescargarPendienteRial.disabled = true;
       btnDescargarCruzado.disabled = true;
       btnDescargarNoCruzado.disabled = true;
     }
@@ -1215,9 +1201,9 @@
       let title = "";
       let subtitle = "";
 
-      if (currentView === "sobrante") {
-        data = resultadoSobrante;
-        title = "Sobrante";
+      if (currentView === "pendienteRial") {
+        data = resultadoPendienteRial;
+        title = "Pendiente de foto RIAL";
         subtitle = `${data.length.toLocaleString("es-CL")} filas`;
       }
 
@@ -1291,8 +1277,8 @@
       const text = String(value ?? "");
 
       if (header === "ESTADO_CRUCE") {
-        if (text === "SOBRANTE") {
-          return `<span class="badge badge-green">SOBRANTE</span>`;
+        if (text === "PENDIENTE FOTO RIAL") {
+          return `<span class="badge badge-green">PENDIENTE FOTO RIAL</span>`;
         }
 
         if (text === "CRUZADO") {
@@ -1313,15 +1299,48 @@
         return;
       }
 
-      const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(data);
 
       XLSX.utils.book_append_sheet(workbook, worksheet, "Resultado");
 
       const fecha = obtenerFechaArchivo();
-      const nombre = `${nombreBase}_${fecha}.xlsx`;
+      XLSX.writeFile(workbook, `${nombreBase}_${fecha}.xlsx`);
+    }
 
-      XLSX.writeFile(workbook, nombre);
+    function descargarTodo() {
+      const hayDatos =
+        resultadoPendienteRial.length > 0 ||
+        resultadoCruzado.length > 0 ||
+        resultadoNoCruzado.length > 0;
+
+      if (!hayDatos) {
+        showMessage("warn", "Sin datos.");
+        return;
+      }
+
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(resultadoPendienteRial),
+        "Pendiente RIAL"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(resultadoCruzado),
+        "Cruzado"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(resultadoNoCruzado),
+        "No cruzado"
+      );
+
+      const fecha = obtenerFechaArchivo();
+      XLSX.writeFile(workbook, `cruce_rial_${fecha}.xlsx`);
     }
 
     function obtenerFechaArchivo() {
@@ -1361,7 +1380,7 @@
       $("nameRial").textContent = "CSV / XLS / XLSX";
 
       actualizarMetricas({
-        sobrante: 0,
+        pendienteRial: 0,
         cruzado: 0,
         noCruzado: 0
       });
