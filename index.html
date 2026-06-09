@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Pendientes Fotográficos</title>
+
+  <!-- Librería para leer y exportar Excel / CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --dark: #111827;
+      --green: #8fca00;
+      --green-dark: #6fa100;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --amber: #d97706;
+      --radius: 18px;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      height: 72px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 34px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 10px 25px rgba(143, 202, 0, 0.35);
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .version {
+      color: var(--muted);
+      font-size: 13px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    main {
+      width: min(1380px, calc(100% - 36px));
+      margin: 26px auto 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #111827 0%, #1f2937 65%, #314300 100%);
+      color: white;
+      padding: 34px;
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.5fr 0.8fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      letter-spacing: -0.05em;
+      line-height: 1.02;
+    }
+
+    .hero p {
+      color: #d1d5db;
+      max-width: 760px;
+      line-height: 1.55;
+      margin: 16px 0 0;
+      font-size: 15px;
+    }
+
+    .logic-box {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .logic-box h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .logic-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #e5e7eb;
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 9px 0;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-top: 5px;
+    }
+
+    .grid {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      padding: 20px 22px 0;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .card-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .upload-box {
+      border: 1.5px dashed #cbd5e1;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      margin-bottom: 14px;
+    }
+
+    .upload-box:hover {
+      border-color: var(--green);
+      background: #fbfff1;
+    }
+
+    .upload-box.loaded {
+      border-color: var(--green);
+      background: #f7ffe8;
+    }
+
+    .upload-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge-green {
+      background: #ecfccb;
+      color: #3f6212;
+    }
+
+    .badge-gray {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-blue {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .file-name {
+      margin-top: 9px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 13px;
+      height: 46px;
+      padding: 0 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      transition: 0.2s ease;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .btn-primary {
+      background: var(--dark);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: #000000;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-green:hover:not(:disabled) {
+      background: var(--green-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-light {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid var(--border);
+    }
+
+    .btn-light:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+
+    .rules {
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .rules h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+    }
+
+    .rules ul {
+      padding-left: 18px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .message.ok {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .message.warn {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 104px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+    }
+
+    .metric.green strong {
+      color: var(--green-dark);
+    }
+
+    .metric.red strong {
+      color: var(--red);
+    }
+
+    .metric.blue strong {
+      color: var(--blue);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 6px 0 16px;
+    }
+
+    .tab {
+      height: 38px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: #334155;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      background: var(--dark);
+      color: white;
+      border-color: var(--dark);
+    }
+
+    .table-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .table-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .download-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .download-actions button {
+      height: 38px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: white;
+      max-height: 560px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 900px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      text-align: left;
+      font-size: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 12.5px;
+      color: #334155;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: #fbfff1;
+    }
+
+    .empty {
+      padding: 45px 18px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.45;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      header {
+        padding: 0 18px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      main {
+        width: min(100% - 22px, 1380px);
+      }
+
+      .hero {
+        padding: 24px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .version {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">F</div>
+      <div>
+        Control de Pendientes Fotográficos
+        <small>Cruce por SKU + descarte por modelo/color</small>
+      </div>
+    </div>
+
+    <div class="version">V0.1.0</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <h1>Cruce simple para detectar pendientes reales.</h1>
+        <p>
+          Carga el reporte principal de calidad y el reporte enviado por proveedor.
+          La herramienta filtra primero los productos sin foto, cruza por SKU y descarta
+          automáticamente el modelo-color completo para no dejar tallas hermanas pendientes.
+        </p>
+      </div>
+
+      <div class="logic-box">
+        <h3>Regla activa</h3>
+
+        <div class="logic-item">
+          <span class="dot"></span>
+          <span>Del reporte principal se consideran solo filas con <strong>AMBIENTADO = 0</strong>.</span>
+        </div>
+
+        <div class="logic-item">
+          <span class="dot"></span>
+          <span>El reporte proveedor se cruza contra el principal usando la columna <strong>SKU</strong>.</span>
+        </div>
+
+        <div class="logic-item">
+          <span class="dot"></span>
+          <span>Si un SKU proveedor aparece en el principal, se descarta todo su <strong>modelo_color</strong>.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <aside class="card">
+        <div class="card-header">
+          <h2>Archivos de entrada</h2>
+          <p>Sube los dos reportes. La página no guarda nada; todo se procesa localmente en tu navegador.</p>
+        </div>
+
+        <div class="card-body">
+          <label class="upload-box" id="boxCalidad" for="fileCalidad">
+            <div class="upload-title">
+              <span>REPORTE CALIDAD</span>
+              <span class="badge badge-gray" id="badgeCalidad">Pendiente</span>
+            </div>
+            <div class="file-name" id="nameCalidad">CSV o Excel del delta principal</div>
+          </label>
+          <input id="fileCalidad" type="file" accept=".csv,.xlsx,.xls" />
+
+          <label class="upload-box" id="boxProveedor" for="fileProveedor">
+            <div class="upload-title">
+              <span>REPORTE PROVEEDOR</span>
+              <span class="badge badge-gray" id="badgeProveedor">Pendiente</span>
+            </div>
+            <div class="file-name" id="nameProveedor">Excel o CSV con los SKU trabajados</div>
+          </label>
+          <input id="fileProveedor" type="file" accept=".csv,.xlsx,.xls" />
+
+          <div class="button-row">
+            <button class="btn-primary" id="btnCruzar" disabled>Cruzar reportes</button>
+            <button class="btn-light" id="btnLimpiar">Limpiar</button>
+          </div>
+
+          <div class="rules">
+            <h3>Columnas esperadas</h3>
+            <ul>
+              <li>Reporte calidad: <strong>SKU</strong>, <strong>AMBIENTADO</strong> y <strong>modelo_color</strong>.</li>
+              <li>Reporte proveedor: <strong>SKU</strong>.</li>
+              <li>La detección de columnas ignora mayúsculas, espacios, guiones y tildes.</li>
+            </ul>
+          </div>
+
+          <div class="message" id="messageBox"></div>
+        </div>
+      </aside>
+
+      <section>
+        <div class="metrics">
+          <div class="metric">
+            <span>Total reporte calidad</span>
+            <strong id="mTotalCalidad">0</strong>
+          </div>
+
+          <div class="metric blue">
+            <span>Filas con AMBIENTADO = 0</span>
+            <strong id="mAmbientado0">0</strong>
+          </div>
+
+          <div class="metric">
+            <span>Total reporte proveedor</span>
+            <strong id="mTotalProveedor">0</strong>
+          </div>
+
+          <div class="metric green">
+            <span>SKU proveedor encontrados</span>
+            <strong id="mSkuEncontrados">0</strong>
+          </div>
+
+          <div class="metric red">
+            <span>Filas descartadas por modelo-color</span>
+            <strong id="mDescartados">0</strong>
+          </div>
+
+          <div class="metric green">
+            <span>Pendientes finales</span>
+            <strong id="mPendientes">0</strong>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="table-actions">
+              <div class="table-title">
+                <h2 id="currentTitle">Resultado</h2>
+                <p id="currentSubtitle">Carga ambos archivos y presiona “Cruzar reportes”.</p>
+              </div>
+
+              <div class="download-actions">
+                <button class="btn-green" id="btnDescargarPendientes" disabled>Descargar pendientes</button>
+                <button class="btn-light" id="btnDescargarDescartados" disabled>Descargar descartados</button>
+                <button class="btn-light" id="btnDescargarResumen" disabled>Descargar resumen</button>
+              </div>
+            </div>
+
+            <div class="tabs">
+              <button class="tab active" data-view="pendientes">Pendientes</button>
+              <button class="tab" data-view="descartados">Descartados</button>
+              <button class="tab" data-view="resumen">Resumen modelo-color</button>
+            </div>
+
+            <div id="emptyState" class="empty">
+              Todavía no hay resultados para mostrar.
+            </div>
+
+            <div id="tableContainer" class="table-wrap hidden"></div>
+
+            <div class="footer-note" id="footerNote">
+              Se muestran hasta 500 filas en pantalla para mantener la página rápida. La descarga incluye el resultado completo.
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    let calidadRows = [];
+    let proveedorRows = [];
+
+    let resultadoPendientes = [];
+    let resultadoDescartados = [];
+    let resultadoResumen = [];
+
+    let columnasCalidad = {};
+    let columnasProveedor = {};
+
+    let currentView = "pendientes";
+
+    const $ = (id) => document.getElementById(id);
+
+    const fileCalidad = $("fileCalidad");
+    const fileProveedor = $("fileProveedor");
+    const btnCruzar = $("btnCruzar");
+    const btnLimpiar = $("btnLimpiar");
+
+    const btnDescargarPendientes = $("btnDescargarPendientes");
+    const btnDescargarDescartados = $("btnDescargarDescartados");
+    const btnDescargarResumen = $("btnDescargarResumen");
+
+    fileCalidad.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        calidadRows = await leerArchivo(file);
+        $("boxCalidad").classList.add("loaded");
+        $("badgeCalidad").className = "badge badge-green";
+        $("badgeCalidad").textContent = "Cargado";
+        $("nameCalidad").textContent = `${file.name} · ${calidadRows.length.toLocaleString("es-CL")} filas`;
+        validarBotonCruce();
+        showMessage("ok", "Reporte calidad cargado correctamente.");
+      } catch (error) {
+        calidadRows = [];
+        showMessage("error", "No se pudo leer el reporte calidad. Revisa que sea CSV, XLSX o XLS.");
+        console.error(error);
+      }
+    });
+
+    fileProveedor.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        proveedorRows = await leerArchivo(file);
+        $("boxProveedor").classList.add("loaded");
+        $("badgeProveedor").className = "badge badge-green";
+        $("badgeProveedor").textContent = "Cargado";
+        $("nameProveedor").textContent = `${file.name} · ${proveedorRows.length.toLocaleString("es-CL")} filas`;
+        validarBotonCruce();
+        showMessage("ok", "Reporte proveedor cargado correctamente.");
+      } catch (error) {
+        proveedorRows = [];
+        showMessage("error", "No se pudo leer el reporte proveedor. Revisa que sea CSV, XLSX o XLS.");
+        console.error(error);
+      }
+    });
+
+    btnCruzar.addEventListener("click", cruzarReportes);
+    btnLimpiar.addEventListener("click", limpiarTodo);
+
+    btnDescargarPendientes.addEventListener("click", () => {
+      descargarExcel(resultadoPendientes, "pendientes_fotograficos");
+    });
+
+    btnDescargarDescartados.addEventListener("click", () => {
+      descargarExcel(resultadoDescartados, "descartados_por_modelo_color");
+    });
+
+    btnDescargarResumen.addEventListener("click", () => {
+      descargarExcel(resultadoResumen, "resumen_modelo_color");
+    });
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentView = tab.dataset.view;
+        renderVistaActual();
+      });
+    });
+
+    function validarBotonCruce() {
+      btnCruzar.disabled = !(calidadRows.length > 0 && proveedorRows.length > 0);
+    }
+
+    async function leerArchivo(file) {
+      const extension = file.name.split(".").pop().toLowerCase();
+      const arrayBuffer = await file.arrayBuffer();
+
+      const workbook = XLSX.read(arrayBuffer, {
+        type: "array",
+        raw: false,
+        cellDates: false
+      });
+
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      const rows = XLSX.utils.sheet_to_json(worksheet, {
+        defval: "",
+        raw: false
+      });
+
+      return rows.map((row) => limpiarFila(row)).filter((row) => Object.keys(row).length > 0);
+    }
+
+    function limpiarFila(row) {
+      const nueva = {};
+
+      Object.keys(row).forEach((key) => {
+        const cleanKey = String(key).trim();
+        const value = row[key];
+
+        if (cleanKey !== "") {
+          nueva[cleanKey] = typeof value === "string" ? value.trim() : value;
+        }
+      });
+
+      return nueva;
+    }
+
+    function cruzarReportes() {
+      try {
+        resetResultados();
+
+        columnasCalidad = detectarColumnasCalidad(calidadRows);
+        columnasProveedor = detectarColumnasProveedor(proveedorRows);
+
+        const colSkuCalidad = columnasCalidad.sku;
+        const colAmbientado = columnasCalidad.ambientado;
+        const colModeloColor = columnasCalidad.modeloColor;
+        const colSkuProveedor = columnasProveedor.sku;
+
+        if (!colSkuCalidad || !colAmbientado || !colModeloColor) {
+          showMessage(
+            "error",
+            "Faltan columnas en el reporte calidad. Debe tener SKU, AMBIENTADO y modelo_color."
+          );
+          return;
+        }
+
+        if (!colSkuProveedor) {
+          showMessage(
+            "error",
+            "Falta la columna SKU en el reporte proveedor."
+          );
+          return;
+        }
+
+        const calidadConDatos = calidadRows
+          .map((row, index) => ({
+            ...row,
+            __fila_origen: index + 2,
+            __sku_normalizado: normalizarSku(row[colSkuCalidad]),
+            __modelo_color_normalizado: normalizarTextoClave(row[colModeloColor]),
+            __ambientado_normalizado: normalizarValor(row[colAmbientado])
+          }))
+          .filter((row) => row.__sku_normalizado !== "");
+
+        const proveedorConDatos = proveedorRows
+          .map((row, index) => ({
+            ...row,
+            __fila_origen_proveedor: index + 2,
+            __sku_normalizado: normalizarSku(row[colSkuProveedor])
+          }))
+          .filter((row) => row.__sku_normalizado !== "");
+
+        /*
+          Regla 1:
+          Solo quedan como base pendiente los productos con AMBIENTADO = 0.
+        */
+        const calidadAmbientado0 = calidadConDatos.filter((row) => {
+          return esAmbientadoCero(row.__ambientado_normalizado);
+        });
+
+        /*
+          Mapa SKU -> modelo_color usando el reporte principal completo.
+
+          Esto es importante porque si proveedor devuelve un SKU que en el delta
+          aparece con AMBIENTADO = 1, igual puede servir para detectar su modelo_color
+          y eliminar hermanos que todavía estén en AMBIENTADO = 0.
+        */
+        const mapaSkuModeloColor = new Map();
+
+        calidadConDatos.forEach((row) => {
+          if (row.__sku_normalizado && row.__modelo_color_normalizado) {
+            mapaSkuModeloColor.set(row.__sku_normalizado, {
+              modeloColorNormalizado: row.__modelo_color_normalizado,
+              modeloColorOriginal: row[colModeloColor]
+            });
+          }
+        });
+
+        const modelosColorTrabajados = new Map();
+        const skusProveedorEncontrados = new Set();
+
+        proveedorConDatos.forEach((rowProveedor) => {
+          const skuProveedor = rowProveedor.__sku_normalizado;
+
+          if (mapaSkuModeloColor.has(skuProveedor)) {
+            const infoModelo = mapaSkuModeloColor.get(skuProveedor);
+
+            skusProveedorEncontrados.add(skuProveedor);
+
+            if (!modelosColorTrabajados.has(infoModelo.modeloColorNormalizado)) {
+              modelosColorTrabajados.set(infoModelo.modeloColorNormalizado, {
+                modeloColorOriginal: infoModelo.modeloColorOriginal,
+                skusProveedor: new Set()
+              });
+            }
+
+            modelosColorTrabajados.get(infoModelo.modeloColorNormalizado).skusProveedor.add(skuProveedor);
+          }
+        });
+
+        resultadoPendientes = [];
+        resultadoDescartados = [];
+
+        calidadAmbientado0.forEach((row) => {
+          const modeloKey = row.__modelo_color_normalizado;
+
+          const filaLimpia = quitarCamposInternos(row);
+
+          if (modelosColorTrabajados.has(modeloKey)) {
+            const info = modelosColorTrabajados.get(modeloKey);
+
+            resultadoDescartados.push({
+              ...filaLimpia,
+              MOTIVO_DESCARTE: "Proveedor trabajó un SKU del mismo modelo_color",
+              MODELO_COLOR_DESCARTADO: info.modeloColorOriginal,
+              SKU_PROVEEDOR_ENCONTRADO: Array.from(info.skusProveedor).join(", ")
+            });
+          } else {
+            resultadoPendientes.push(filaLimpia);
+          }
+        });
+
+        resultadoResumen = construirResumenModeloColor(
+          calidadAmbientado0,
+          modelosColorTrabajados,
+          colModeloColor,
+          colSkuCalidad
+        );
+
+        actualizarMetricas({
+          totalCalidad: calidadRows.length,
+          ambientado0: calidadAmbientado0.length,
+          totalProveedor: proveedorRows.length,
+          skuEncontrados: skusProveedorEncontrados.size,
+          modelosColorDescartados: modelosColorTrabajados.size,
+          descartados: resultadoDescartados.length,
+          pendientes: resultadoPendientes.length
+        });
+
+        activarDescargas();
+
+        currentView = "pendientes";
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        document.querySelector('[data-view="pendientes"]').classList.add("active");
+
+        renderVistaActual();
+
+        showMessage(
+          "ok",
+          `Cruce listo: ${resultadoPendientes.length.toLocaleString("es-CL")} filas pendientes y ${resultadoDescartados.length.toLocaleString("es-CL")} filas descartadas por modelo-color.`
+        );
+
+      } catch (error) {
+        console.error(error);
+        showMessage("error", "Ocurrió un error al cruzar los reportes. Revisa que las columnas tengan nombres reconocibles.");
+      }
+    }
+
+    function detectarColumnasCalidad(rows) {
+      const headers = obtenerHeaders(rows);
+
+      return {
+        sku: buscarHeader(headers, [
+          "sku",
+          "id sku",
+          "id_sku",
+          "product sku",
+          "sku hijo",
+          "skuhijo"
+        ]),
+        ambientado: buscarHeader(headers, [
+          "ambientado",
+          "tiene foto",
+          "tiene_foto",
+          "foto",
+          "foto ambientada",
+          "foto_ambientada",
+          "% foto pub ai",
+          "foto pub ai"
+        ]),
+        modeloColor: buscarHeader(headers, [
+          "modelo_color",
+          "modelo color",
+          "modelocolor",
+          "modelo-color",
+          "modelo / color",
+          "modelo/color"
+        ])
+      };
+    }
+
+    function detectarColumnasProveedor(rows) {
+      const headers = obtenerHeaders(rows);
+
+      return {
+        sku: buscarHeader(headers, [
+          "sku",
+          "id sku",
+          "id_sku",
+          "product sku",
+          "sku hijo",
+          "skuhijo"
+        ])
+      };
+    }
+
+    function obtenerHeaders(rows) {
+      const set = new Set();
+
+      rows.forEach((row) => {
+        Object.keys(row).forEach((key) => set.add(key));
+      });
+
+      return Array.from(set);
+    }
+
+    function buscarHeader(headers, candidates) {
+      const normalizados = headers.map((header) => ({
+        original: header,
+        normalizado: normalizarHeader(header)
+      }));
+
+      const candidatosNormalizados = candidates.map((c) => normalizarHeader(c));
+
+      for (const candidato of candidatosNormalizados) {
+        const encontradoExacto = normalizados.find((h) => h.normalizado === candidato);
+        if (encontradoExacto) return encontradoExacto.original;
+      }
+
+      for (const candidato of candidatosNormalizados) {
+        const encontradoParcial = normalizados.find((h) => h.normalizado.includes(candidato));
+        if (encontradoParcial) return encontradoParcial.original;
+      }
+
+      return null;
+    }
+
+    function normalizarHeader(value) {
+      return String(value ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[%]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function normalizarSku(value) {
+      let sku = String(value ?? "").trim();
+
+      if (sku === "") return "";
+
+      sku = sku
+        .replace(/\s+/g, "")
+        .replace(/\.0$/, "");
+
+      return sku;
+    }
+
+    function normalizarValor(value) {
+      return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(",", ".")
+        .replace(/\s+/g, "");
+    }
+
+    function normalizarTextoClave(value) {
+      return String(value ?? "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, " ");
+    }
+
+    function esAmbientadoCero(value) {
+      const limpio = normalizarValor(value);
+
+      return limpio === "0" ||
+             limpio === "0.0" ||
+             limpio === "no" ||
+             limpio === "false" ||
+             limpio === "sinfoto" ||
+             limpio === "pendiente";
+    }
+
+    function quitarCamposInternos(row) {
+      const limpio = {};
+
+      Object.keys(row).forEach((key) => {
+        if (!key.startsWith("__")) {
+          limpio[key] = row[key];
+        }
+      });
+
+      return limpio;
+    }
+
+    function construirResumenModeloColor(calidadAmbientado0, modelosColorTrabajados, colModeloColor, colSkuCalidad) {
+      const resumenMap = new Map();
+
+      calidadAmbientado0.forEach((row) => {
+        const modeloKey = row.__modelo_color_normalizado || "SIN_MODELO_COLOR";
+        const modeloOriginal = row[colModeloColor] || "SIN MODELO_COLOR";
+
+        if (!resumenMap.has(modeloKey)) {
+          resumenMap.set(modeloKey, {
+            modelo_color: modeloOriginal,
+            total_skus_ambientado_0: 0,
+            skus_ambientado_0: [],
+            estado: modelosColorTrabajados.has(modeloKey) ? "DESCARTADO" : "PENDIENTE",
+            sku_proveedor_detectado: modelosColorTrabajados.has(modeloKey)
+              ? Array.from(modelosColorTrabajados.get(modeloKey).skusProveedor).join(", ")
+              : ""
+          });
+        }
+
+        const item = resumenMap.get(modeloKey);
+        item.total_skus_ambientado_0 += 1;
+        item.skus_ambientado_0.push(normalizarSku(row[colSkuCalidad]));
+      });
+
+      return Array.from(resumenMap.values()).map((item) => ({
+        modelo_color: item.modelo_color,
+        estado: item.estado,
+        total_skus_ambientado_0: item.total_skus_ambientado_0,
+        skus_ambientado_0: item.skus_ambientado_0.join(", "),
+        sku_proveedor_detectado: item.sku_proveedor_detectado
+      }));
+    }
+
+    function actualizarMetricas(data) {
+      $("mTotalCalidad").textContent = data.totalCalidad.toLocaleString("es-CL");
+      $("mAmbientado0").textContent = data.ambientado0.toLocaleString("es-CL");
+      $("mTotalProveedor").textContent = data.totalProveedor.toLocaleString("es-CL");
+      $("mSkuEncontrados").textContent = data.skuEncontrados.toLocaleString("es-CL");
+      $("mDescartados").textContent = data.descartados.toLocaleString("es-CL");
+      $("mPendientes").textContent = data.pendientes.toLocaleString("es-CL");
+    }
+
+    function activarDescargas() {
+      btnDescargarPendientes.disabled = resultadoPendientes.length === 0;
+      btnDescargarDescartados.disabled = resultadoDescartados.length === 0;
+      btnDescargarResumen.disabled = resultadoResumen.length === 0;
+    }
+
+    function resetResultados() {
+      resultadoPendientes = [];
+      resultadoDescartados = [];
+      resultadoResumen = [];
+
+      btnDescargarPendientes.disabled = true;
+      btnDescargarDescartados.disabled = true;
+      btnDescargarResumen.disabled = true;
+    }
+
+    function renderVistaActual() {
+      let data = [];
+      let title = "";
+      let subtitle = "";
+
+      if (currentView === "pendientes") {
+        data = resultadoPendientes;
+        title = "Pendientes finales";
+        subtitle = "Filas con AMBIENTADO = 0 que no pertenecen a un modelo_color ya trabajado por proveedor.";
+      }
+
+      if (currentView === "descartados") {
+        data = resultadoDescartados;
+        title = "Descartados por proveedor";
+        subtitle = "Filas eliminadas porque un SKU del mismo modelo_color fue encontrado en el reporte proveedor.";
+      }
+
+      if (currentView === "resumen") {
+        data = resultadoResumen;
+        title = "Resumen por modelo-color";
+        subtitle = "Agrupación de modelos-color pendientes o descartados, con sus SKU asociados.";
+      }
+
+      $("currentTitle").textContent = title;
+      $("currentSubtitle").textContent = subtitle;
+
+      renderTabla(data);
+    }
+
+    function renderTabla(data) {
+      const emptyState = $("emptyState");
+      const tableContainer = $("tableContainer");
+
+      if (!data || data.length === 0) {
+        emptyState.classList.remove("hidden");
+        tableContainer.classList.add("hidden");
+        tableContainer.innerHTML = "";
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      tableContainer.classList.remove("hidden");
+
+      const dataLimitada = data.slice(0, 500);
+      const headers = obtenerHeaders(dataLimitada);
+
+      let html = "<table><thead><tr>";
+
+      headers.forEach((header) => {
+        html += `<th>${escapeHtml(header)}</th>`;
+      });
+
+      html += "</tr></thead><tbody>";
+
+      dataLimitada.forEach((row) => {
+        html += "<tr>";
+
+        headers.forEach((header) => {
+          const value = row[header] ?? "";
+          html += `<td>${renderCell(value, header)}</td>`;
+        });
+
+        html += "</tr>";
+      });
+
+      html += "</tbody></table>";
+
+      tableContainer.innerHTML = html;
+
+      if (data.length > 500) {
+        $("footerNote").textContent = `Se muestran 500 de ${data.length.toLocaleString("es-CL")} filas. La descarga incluye el resultado completo.`;
+      } else {
+        $("footerNote").textContent = `Se muestran ${data.length.toLocaleString("es-CL")} filas.`;
+      }
+    }
+
+    function renderCell(value, header) {
+      const text = String(value ?? "");
+
+      if (header.toLowerCase() === "estado") {
+        if (text === "PENDIENTE") {
+          return `<span class="badge badge-green">PENDIENTE</span>`;
+        }
+
+        if (text === "DESCARTADO") {
+          return `<span class="badge badge-red">DESCARTADO</span>`;
+        }
+      }
+
+      if (header === "MOTIVO_DESCARTE") {
+        return `<span class="badge badge-blue">${escapeHtml(text)}</span>`;
+      }
+
+      return escapeHtml(text);
+    }
+
+    function descargarExcel(data, nombreBase) {
+      if (!data || data.length === 0) {
+        showMessage("warn", "No hay datos para descargar.");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Resultado");
+
+      const fecha = obtenerFechaArchivo();
+      const nombre = `${nombreBase}_${fecha}.xlsx`;
+
+      XLSX.writeFile(workbook, nombre);
+    }
+
+    function obtenerFechaArchivo() {
+      const now = new Date();
+
+      const pad = (n) => String(n).padStart(2, "0");
+
+      const yyyy = now.getFullYear();
+      const mm = pad(now.getMonth() + 1);
+      const dd = pad(now.getDate());
+      const hh = pad(now.getHours());
+      const min = pad(now.getMinutes());
+
+      return `${yyyy}-${mm}-${dd}_${hh}${min}`;
+    }
+
+    function limpiarTodo() {
+      calidadRows = [];
+      proveedorRows = [];
+      columnasCalidad = {};
+      columnasProveedor = {};
+
+      resetResultados();
+
+      fileCalidad.value = "";
+      fileProveedor.value = "";
+
+      $("boxCalidad").classList.remove("loaded");
+      $("boxProveedor").classList.remove("loaded");
+
+      $("badgeCalidad").className = "badge badge-gray";
+      $("badgeProveedor").className = "badge badge-gray";
+
+      $("badgeCalidad").textContent = "Pendiente";
+      $("badgeProveedor").textContent = "Pendiente";
+
+      $("nameCalidad").textContent = "CSV o Excel del delta principal";
+      $("nameProveedor").textContent = "Excel o CSV con los SKU trabajados";
+
+      actualizarMetricas({
+        totalCalidad: 0,
+        ambientado0: 0,
+        totalProveedor: 0,
+        skuEncontrados: 0,
+        modelosColorDescartados: 0,
+        descartados: 0,
+        pendientes: 0
+      });
+
+      $("currentTitle").textContent = "Resultado";
+      $("currentSubtitle").textContent = "Carga ambos archivos y presiona “Cruzar reportes”.";
+
+      $("emptyState").classList.remove("hidden");
+      $("tableContainer").classList.add("hidden");
+      $("tableContainer").innerHTML = "";
+
+      $("footerNote").textContent = "Se muestran hasta 500 filas en pantalla para mantener la página rápida. La descarga incluye el resultado completo.";
+
+      btnCruzar.disabled = true;
+
+      showMessage("ok", "Página limpia. Puedes cargar nuevos reportes.");
+    }
+
+    function showMessage(type, text) {
+      const box = $("messageBox");
+
+      box.className = `message show ${type}`;
+      box.textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
