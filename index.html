@@ -660,7 +660,7 @@
     </div>
 
     <div class="header-actions">
-      <div class="version">V0.1.5</div>
+      <div class="version">V0.1.6</div>
       <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
     </div>
   </header>
@@ -1020,11 +1020,18 @@
         });
 
         const skusRial = new Set(rialConDatos.map((row) => row.__sku_normalizado));
+        const skusReporteFiltrado = new Set(reporteFiltrado.map((row) => row.__sku_normalizado));
+
         const modelosColorOk = new Map();
+        const skusReporteOk = new Set();
 
         reporteFiltrado.forEach((row) => {
-          if (skusRial.has(row.__sku_normalizado)) {
+          const skuReporte = row.__sku_normalizado;
+
+          if (skusRial.has(skuReporte)) {
             const modeloKey = row.__modelo_color_normalizado;
+
+            skusReporteOk.add(skuReporte);
 
             if (!modelosColorOk.has(modeloKey)) {
               modelosColorOk.set(modeloKey, {
@@ -1033,13 +1040,12 @@
               });
             }
 
-            modelosColorOk.get(modeloKey).skusReporte.add(row.__sku_normalizado);
+            modelosColorOk.get(modeloKey).skusReporte.add(skuReporte);
           }
         });
 
         resultadoPendienteRial = [];
         resultadoOkRial = [];
-        resultadoNoCruzado = [];
 
         reporteFiltrado.forEach((row) => {
           const modeloKey = row.__modelo_color_normalizado;
@@ -1060,14 +1066,14 @@
               ESTADO_CRUCE: "PENDIENTE RIAL"
             });
           }
-
-          if (!skusRial.has(row.__sku_normalizado)) {
-            resultadoNoCruzado.push({
-              ...filaLimpia,
-              ESTADO_CRUCE: "NO CRUZADO"
-            });
-          }
         });
+
+        resultadoNoCruzado = rialConDatos
+          .filter((row) => !skusReporteFiltrado.has(row.__sku_normalizado))
+          .map((row) => ({
+            ...quitarCamposInternos(row),
+            ESTADO_CRUCE: "NO CRUZADO"
+          }));
 
         actualizarMetricas({
           pendienteRial: resultadoPendienteRial.length,
