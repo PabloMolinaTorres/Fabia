@@ -405,17 +405,6 @@
       border: 1px solid var(--border);
     }
 
-    .rules {
-      margin-top: 18px;
-      padding: 15px;
-      border-radius: 14px;
-      background: var(--panel-soft);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.6;
-    }
-
     .message {
       margin-top: 14px;
       padding: 12px 14px;
@@ -671,7 +660,7 @@
     </div>
 
     <div class="header-actions">
-      <div class="version">V0.1.4</div>
+      <div class="version">V0.1.5</div>
       <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
     </div>
   </header>
@@ -723,10 +712,6 @@
                 <button class="btn-light" id="btnLimpiar">Limpiar</button>
               </div>
 
-              <div class="rules">
-                Reporte: <strong>SKU</strong>, <strong>modelo_color</strong>, <strong>% FOTO PUB AI</strong>.
-              </div>
-
               <div class="message" id="messageBox"></div>
             </div>
           </aside>
@@ -739,8 +724,8 @@
               </div>
 
               <div class="metric blue">
-                <span>Cruzado</span>
-                <strong id="mCruzado">0</strong>
+                <span>OK RIAL</span>
+                <strong id="mOkRial">0</strong>
               </div>
 
               <div class="metric red">
@@ -760,14 +745,14 @@
                   <div class="download-actions">
                     <button class="btn-green" id="btnDescargarTodo" disabled>Descargar todo</button>
                     <button class="btn-light" id="btnDescargarPendienteRial" disabled>Pendiente RIAL</button>
-                    <button class="btn-light" id="btnDescargarCruzado" disabled>Cruzado</button>
+                    <button class="btn-light" id="btnDescargarOkRial" disabled>OK RIAL</button>
                     <button class="btn-light" id="btnDescargarNoCruzado" disabled>No cruzado</button>
                   </div>
                 </div>
 
                 <div class="tabs">
                   <button class="tab active" data-view="pendienteRial">Pendiente RIAL</button>
-                  <button class="tab" data-view="cruzado">Cruzado</button>
+                  <button class="tab" data-view="okRial">OK RIAL</button>
                   <button class="tab" data-view="noCruzado">No cruzado</button>
                 </div>
 
@@ -793,7 +778,7 @@
     let rialRows = [];
 
     let resultadoPendienteRial = [];
-    let resultadoCruzado = [];
+    let resultadoOkRial = [];
     let resultadoNoCruzado = [];
 
     let columnasReporte = {};
@@ -811,7 +796,7 @@
 
     const btnDescargarTodo = $("btnDescargarTodo");
     const btnDescargarPendienteRial = $("btnDescargarPendienteRial");
-    const btnDescargarCruzado = $("btnDescargarCruzado");
+    const btnDescargarOkRial = $("btnDescargarOkRial");
     const btnDescargarNoCruzado = $("btnDescargarNoCruzado");
 
     iniciarTema();
@@ -872,8 +857,8 @@
       descargarExcel(resultadoPendienteRial, "pendiente_rial");
     });
 
-    btnDescargarCruzado.addEventListener("click", () => {
-      descargarExcel(resultadoCruzado, "cruzado");
+    btnDescargarOkRial.addEventListener("click", () => {
+      descargarExcel(resultadoOkRial, "ok_rial");
     });
 
     btnDescargarNoCruzado.addEventListener("click", () => {
@@ -1034,54 +1019,40 @@
           return !esValorNull(row.__foto_pub_ai_normalizado);
         });
 
-        const mapaSkuModeloColor = new Map();
+        const skusRial = new Set(rialConDatos.map((row) => row.__sku_normalizado));
+        const modelosColorOk = new Map();
 
         reporteFiltrado.forEach((row) => {
-          if (row.__sku_normalizado && row.__modelo_color_normalizado) {
-            mapaSkuModeloColor.set(row.__sku_normalizado, {
-              modeloColorNormalizado: row.__modelo_color_normalizado,
-              modeloColorOriginal: row[colModeloColor]
-            });
-          }
-        });
+          if (skusRial.has(row.__sku_normalizado)) {
+            const modeloKey = row.__modelo_color_normalizado;
 
-        const modelosColorCruzados = new Map();
-        const skusRialCruzados = new Set();
-
-        rialConDatos.forEach((rowRial) => {
-          const skuRial = rowRial.__sku_normalizado;
-
-          if (mapaSkuModeloColor.has(skuRial)) {
-            const infoModelo = mapaSkuModeloColor.get(skuRial);
-
-            skusRialCruzados.add(skuRial);
-
-            if (!modelosColorCruzados.has(infoModelo.modeloColorNormalizado)) {
-              modelosColorCruzados.set(infoModelo.modeloColorNormalizado, {
-                modeloColorOriginal: infoModelo.modeloColorOriginal,
-                skusRial: new Set()
+            if (!modelosColorOk.has(modeloKey)) {
+              modelosColorOk.set(modeloKey, {
+                modeloColorOriginal: row[colModeloColor],
+                skusReporte: new Set()
               });
             }
 
-            modelosColorCruzados.get(infoModelo.modeloColorNormalizado).skusRial.add(skuRial);
+            modelosColorOk.get(modeloKey).skusReporte.add(row.__sku_normalizado);
           }
         });
 
         resultadoPendienteRial = [];
-        resultadoCruzado = [];
+        resultadoOkRial = [];
+        resultadoNoCruzado = [];
 
         reporteFiltrado.forEach((row) => {
           const modeloKey = row.__modelo_color_normalizado;
           const filaLimpia = quitarCamposInternos(row);
 
-          if (modelosColorCruzados.has(modeloKey)) {
-            const info = modelosColorCruzados.get(modeloKey);
+          if (modelosColorOk.has(modeloKey)) {
+            const info = modelosColorOk.get(modeloKey);
 
-            resultadoCruzado.push({
+            resultadoOkRial.push({
               ...filaLimpia,
-              ESTADO_CRUCE: "CRUZADO",
-              MODELO_COLOR_CRUZADO: info.modeloColorOriginal,
-              SKU_RIAL_ENCONTRADO: Array.from(info.skusRial).join(", ")
+              ESTADO_CRUCE: "OK RIAL",
+              MODELO_COLOR_OK: info.modeloColorOriginal,
+              SKU_OK_RIAL: Array.from(info.skusReporte).join(", ")
             });
           } else {
             resultadoPendienteRial.push({
@@ -1089,18 +1060,18 @@
               ESTADO_CRUCE: "PENDIENTE RIAL"
             });
           }
-        });
 
-        resultadoNoCruzado = rialConDatos
-          .filter((row) => !skusRialCruzados.has(row.__sku_normalizado))
-          .map((row) => ({
-            ...quitarCamposInternos(row),
-            ESTADO_CRUCE: "NO CRUZADO"
-          }));
+          if (!skusRial.has(row.__sku_normalizado)) {
+            resultadoNoCruzado.push({
+              ...filaLimpia,
+              ESTADO_CRUCE: "NO CRUZADO"
+            });
+          }
+        });
 
         actualizarMetricas({
           pendienteRial: resultadoPendienteRial.length,
-          cruzado: resultadoCruzado.length,
+          okRial: resultadoOkRial.length,
           noCruzado: resultadoNoCruzado.length
         });
 
@@ -1259,30 +1230,30 @@
 
     function actualizarMetricas(data) {
       $("mPendienteRial").textContent = data.pendienteRial.toLocaleString("es-CL");
-      $("mCruzado").textContent = data.cruzado.toLocaleString("es-CL");
+      $("mOkRial").textContent = data.okRial.toLocaleString("es-CL");
       $("mNoCruzado").textContent = data.noCruzado.toLocaleString("es-CL");
     }
 
     function activarDescargas() {
       const hayDatos =
         resultadoPendienteRial.length > 0 ||
-        resultadoCruzado.length > 0 ||
+        resultadoOkRial.length > 0 ||
         resultadoNoCruzado.length > 0;
 
       btnDescargarTodo.disabled = !hayDatos;
       btnDescargarPendienteRial.disabled = resultadoPendienteRial.length === 0;
-      btnDescargarCruzado.disabled = resultadoCruzado.length === 0;
+      btnDescargarOkRial.disabled = resultadoOkRial.length === 0;
       btnDescargarNoCruzado.disabled = resultadoNoCruzado.length === 0;
     }
 
     function resetResultados() {
       resultadoPendienteRial = [];
-      resultadoCruzado = [];
+      resultadoOkRial = [];
       resultadoNoCruzado = [];
 
       btnDescargarTodo.disabled = true;
       btnDescargarPendienteRial.disabled = true;
-      btnDescargarCruzado.disabled = true;
+      btnDescargarOkRial.disabled = true;
       btnDescargarNoCruzado.disabled = true;
     }
 
@@ -1297,9 +1268,9 @@
         subtitle = `${data.length.toLocaleString("es-CL")} filas`;
       }
 
-      if (currentView === "cruzado") {
-        data = resultadoCruzado;
-        title = "Cruzado";
+      if (currentView === "okRial") {
+        data = resultadoOkRial;
+        title = "OK RIAL";
         subtitle = `${data.length.toLocaleString("es-CL")} filas`;
       }
 
@@ -1371,8 +1342,8 @@
           return `<span class="badge badge-green">PENDIENTE RIAL</span>`;
         }
 
-        if (text === "CRUZADO") {
-          return `<span class="badge badge-blue">CRUZADO</span>`;
+        if (text === "OK RIAL") {
+          return `<span class="badge badge-blue">OK RIAL</span>`;
         }
 
         if (text === "NO CRUZADO") {
@@ -1401,7 +1372,7 @@
     function descargarTodo() {
       const hayDatos =
         resultadoPendienteRial.length > 0 ||
-        resultadoCruzado.length > 0 ||
+        resultadoOkRial.length > 0 ||
         resultadoNoCruzado.length > 0;
 
       if (!hayDatos) {
@@ -1419,8 +1390,8 @@
 
       XLSX.utils.book_append_sheet(
         workbook,
-        XLSX.utils.json_to_sheet(resultadoCruzado),
-        "Cruzado"
+        XLSX.utils.json_to_sheet(resultadoOkRial),
+        "OK RIAL"
       );
 
       XLSX.utils.book_append_sheet(
@@ -1430,7 +1401,7 @@
       );
 
       const fecha = obtenerFechaArchivo();
-      XLSX.writeFile(workbook, `cruce_rial_${fecha}.xlsx`);
+      XLSX.writeFile(workbook, `pendiente_rial_${fecha}.xlsx`);
     }
 
     function obtenerFechaArchivo() {
@@ -1471,7 +1442,7 @@
 
       actualizarMetricas({
         pendienteRial: 0,
-        cruzado: 0,
+        okRial: 0,
         noCruzado: 0
       });
 
