@@ -660,7 +660,7 @@
     </div>
 
     <div class="header-actions">
-      <div class="version">V0.1.6</div>
+      <div class="version">V0.1.7</div>
       <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
     </div>
   </header>
@@ -984,10 +984,10 @@
 
         const colSkuReporte = columnasReporte.sku;
         const colModeloColor = columnasReporte.modeloColor;
-        const colFotoPubAi = columnasReporte.fotoPubAi;
+        const colAmbientado = columnasReporte.ambientado;
         const colSkuRial = columnasRial.sku;
 
-        if (!colSkuReporte || !colModeloColor || !colFotoPubAi) {
+        if (!colSkuReporte || !colModeloColor || !colAmbientado) {
           showMessage("error", "Faltan columnas en reporte.");
           return;
         }
@@ -1003,7 +1003,7 @@
             __fila_reporte: index + 2,
             __sku_normalizado: normalizarSku(row[colSkuReporte]),
             __modelo_color_normalizado: normalizarTextoClave(row[colModeloColor]),
-            __foto_pub_ai_normalizado: normalizarValor(row[colFotoPubAi])
+            __ambientado_normalizado: normalizarValor(row[colAmbientado])
           }))
           .filter((row) => row.__sku_normalizado !== "");
 
@@ -1016,22 +1016,19 @@
           .filter((row) => row.__sku_normalizado !== "");
 
         const reporteFiltrado = reporteConDatos.filter((row) => {
-          return !esValorNull(row.__foto_pub_ai_normalizado);
+          return !esAmbientadoUno(row.__ambientado_normalizado);
         });
 
         const skusRial = new Set(rialConDatos.map((row) => row.__sku_normalizado));
         const skusReporteFiltrado = new Set(reporteFiltrado.map((row) => row.__sku_normalizado));
 
         const modelosColorOk = new Map();
-        const skusReporteOk = new Set();
 
         reporteFiltrado.forEach((row) => {
           const skuReporte = row.__sku_normalizado;
 
           if (skusRial.has(skuReporte)) {
             const modeloKey = row.__modelo_color_normalizado;
-
-            skusReporteOk.add(skuReporte);
 
             if (!modelosColorOk.has(modeloKey)) {
               modelosColorOk.set(modeloKey, {
@@ -1116,14 +1113,12 @@
           "modelo / color",
           "modelo/color"
         ]),
-        fotoPubAi: buscarHeader(headers, [
-          "% foto pub ai",
-          "foto pub ai",
-          "foto_pub_ai",
-          "foto publica ai",
-          "foto pública ai",
-          "foto ai",
-          "pub ai"
+        ambientado: buscarHeader(headers, [
+          "ambientado",
+          "foto ambientada",
+          "foto_ambientada",
+          "tiene foto",
+          "tiene_foto"
         ])
       };
     }
@@ -1210,16 +1205,14 @@
         .replace(/\s+/g, " ");
     }
 
-    function esValorNull(value) {
+    function esAmbientadoUno(value) {
       const limpio = normalizarValor(value);
 
-      return limpio === "" ||
-             limpio === "null" ||
-             limpio === "nan" ||
-             limpio === "undefined" ||
-             limpio === "-" ||
-             limpio === "sininfo" ||
-             limpio === "sin";
+      return limpio === "1" ||
+             limpio === "1.0" ||
+             limpio === "si" ||
+             limpio === "sí" ||
+             limpio === "true";
     }
 
     function quitarCamposInternos(row) {
