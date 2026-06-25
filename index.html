@@ -3,394 +3,1713 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pendiente RIAL V2</title>
+  <title>Fabia</title>
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     :root {
-      --bg:#f8fafc;--panel:#fff;--panel-soft:#f8fafc;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--border-strong:#94a3b8;--dark:#111827;--green:#8fca00;--green-dark:#6fa100;--blue:#2563eb;--red:#dc2626;--amber:#d97706;--shadow:0 18px 45px rgba(15,23,42,.08);--radius:18px;
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --border-strong: #94a3b8;
+      --dark: #111827;
+      --green: #8fca00;
+      --green-dark: #6fa100;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --amber: #d97706;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
     }
+
     body.dark {
-      --bg:#020617;--panel:#0f172a;--panel-soft:#111827;--text:#f8fafc;--muted:#94a3b8;--border:#1e293b;--border-strong:#475569;--dark:#f8fafc;--green-dark:#a3d900;--blue:#60a5fa;--red:#f87171;--amber:#fbbf24;--shadow:0 18px 45px rgba(0,0,0,.25);
+      --bg: #020617;
+      --panel: #0f172a;
+      --panel-soft: #111827;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --border-strong: #475569;
+      --dark: #f8fafc;
+      --green-dark: #a3d900;
+      --blue: #60a5fa;
+      --red: #f87171;
+      --amber: #fbbf24;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
     }
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    header{height:72px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:20}
-    .brand{display:flex;align-items:center;gap:14px;font-weight:800;letter-spacing:-.02em}.brand-icon{width:42px;height:42px;border-radius:12px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 10px 25px rgba(143,202,0,.28)}.brand small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:2px}
-    .header-actions{display:flex;align-items:center;gap:10px}.version{color:var(--muted);font-size:13px;background:var(--panel-soft);border:1px solid var(--border);padding:8px 12px;border-radius:999px}.theme-toggle{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:var(--panel-soft);color:var(--text);font-size:18px;cursor:pointer}
-    main{width:min(1360px,calc(100% - 36px));margin:26px auto 60px}.app-layout{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:start}.sidebar{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;position:sticky;top:96px}
-    .section-tab{width:100%;height:44px;border-radius:12px;background:transparent;color:var(--muted);border:1px solid transparent;text-align:left;padding:0 14px;font-size:13px;margin-bottom:6px}.section-tab.active{background:var(--dark);color:var(--bg)}body.dark .section-tab.active{background:#f8fafc;color:#020617}
-    .page{max-width:1170px;margin:0 auto;width:100%}.hero{background:linear-gradient(135deg,#111827 0%,#1f2937 70%,#314300 100%);color:#fff;padding:34px 28px;border-radius:26px;box-shadow:var(--shadow)}.hero h1{margin:0;font-size:clamp(34px,5vw,56px);letter-spacing:-.06em;line-height:1}
-    .module-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.module-tab{height:38px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#e5e7eb;padding:0 14px;font-size:13px}.module-tab.active{background:#fff;color:#111827}
-    .grid{margin-top:24px;display:grid;grid-template-columns:410px minmax(0,1fr);gap:22px;align-items:start}.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}.card-header{padding:20px 22px 0}.card-header h2{margin:0;font-size:18px;letter-spacing:-.03em}.card-body{padding:22px}
-    .upload-grid{display:grid;grid-template-columns:1fr;gap:16px}.upload-box{min-height:190px;border:1.5px dashed var(--border-strong);background:var(--panel-soft);border-radius:16px;padding:22px;cursor:pointer;transition:.2s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}.upload-box:hover,.upload-box.dragover{border-color:var(--blue);background:rgba(37,99,235,.06)}.upload-box.loaded{border-style:solid;border-color:var(--border);background:var(--panel-soft)}
-    .upload-icon{width:58px;height:58px;border-radius:50%;background:#eef2f7;color:#475569;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px}body.dark .upload-icon{background:#1e293b;color:#cbd5e1}.upload-title{font-size:18px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px}.upload-subtitle{font-size:13px;color:var(--muted);margin-bottom:14px}.upload-btn{height:34px;border-radius:6px;border:1px solid var(--border);color:var(--blue);background:var(--panel);padding:0 14px;font-size:11px;font-weight:900;letter-spacing:.04em;display:inline-flex;align-items:center;justify-content:center}.upload-status{position:absolute;top:12px;right:12px}.file-name{margin-top:12px;font-size:12px;color:var(--muted);word-break:break-all;max-width:100%}input[type=file]{display:none}
-    .badge{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}.badge-green{background:#ecfccb;color:#3f6212}.badge-gray{background:#f1f5f9;color:#475569}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1d4ed8}.badge-amber{background:#fef3c7;color:#92400e}body.dark .badge-gray{background:#1e293b;color:#cbd5e1}
-    .button-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:18px}.button-row.two{grid-template-columns:1fr 1fr}button{border:none;cursor:pointer;border-radius:13px;height:46px;padding:0 16px;font-weight:800;letter-spacing:-.01em;transition:.2s ease}button:disabled{cursor:not-allowed;opacity:.45}.btn-primary{background:var(--dark);color:var(--bg)}body.dark .btn-primary{background:#f8fafc;color:#020617}.btn-green{background:var(--green);color:#fff}.btn-red{background:var(--red);color:#fff}.btn-light{background:var(--panel-soft);color:var(--text);border:1px solid var(--border)}.btn-primary:hover:not(:disabled),.btn-green:hover:not(:disabled),.btn-light:hover:not(:disabled),.btn-red:hover:not(:disabled),.upload-btn:hover{transform:translateY(-1px)}
-    .message{margin-top:14px;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.45;display:none}.message.show{display:block}.message.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}.message.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}.message.warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
-    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.metrics.three{grid-template-columns:repeat(3,1fr)}.metric{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;min-height:112px}.metric span{display:block;color:var(--muted);font-size:12px;line-height:1.3}.metric strong{display:block;margin-top:12px;font-size:34px;letter-spacing:-.06em}.metric.green strong{color:var(--green-dark)}.metric.red strong{color:var(--red)}.metric.blue strong{color:var(--blue)}.metric.amber strong{color:var(--amber)}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}.tab{height:38px;border-radius:999px;background:var(--panel-soft);border:1px solid var(--border);color:var(--text);padding:0 14px;font-size:13px}.tab.active{background:var(--dark);color:var(--bg);border-color:var(--dark)}body.dark .tab.active{background:#f8fafc;color:#020617}
-    .table-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}.table-title h2{margin:0;font-size:18px;letter-spacing:-.03em}.table-title p{margin:5px 0 0;color:var(--muted);font-size:13px}.download-actions{display:flex;gap:8px;flex-wrap:wrap}.download-actions button{height:38px;font-size:12px;border-radius:999px}.table-wrap{width:100%;overflow:auto;border:1px solid var(--border);border-radius:16px;background:var(--panel);max-height:560px}table{border-collapse:collapse;width:100%;min-width:900px}thead{position:sticky;top:0;z-index:2}th{background:var(--panel-soft);color:var(--text);text-align:left;font-size:12px;padding:12px;border-bottom:1px solid var(--border);white-space:nowrap}td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--muted);vertical-align:top;white-space:nowrap}tr:hover td{background:rgba(37,99,235,.05)}.empty{padding:45px 18px;color:var(--muted);text-align:center;border:1px dashed var(--border);border-radius:16px;background:var(--panel-soft)}.footer-note{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.45}.hidden{display:none!important}
-    @media(max-width:1100px){.app-layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;gap:8px;overflow-x:auto}.section-tab{min-width:110px;margin-bottom:0;text-align:center}.grid{grid-template-columns:1fr}.metrics,.metrics.three{grid-template-columns:1fr}header{padding:0 18px}}@media(max-width:640px){main{width:min(100% - 22px,1380px)}.hero{padding:24px}.version{display:none}.button-row.two{grid-template-columns:1fr}}
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      min-height: 72px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 34px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--green);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      box-shadow: 0 10px 25px rgba(143, 202, 0, 0.28);
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .user-pill,
+    .version {
+      color: var(--muted);
+      font-size: 13px;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    main {
+      width: min(1360px, calc(100% - 36px));
+      margin: 26px auto 60px;
+    }
+
+    .login-wrap {
+      min-height: calc(100vh - 150px);
+      display: grid;
+      place-items: center;
+    }
+
+    .login-card {
+      width: min(460px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .login-card h1 {
+      margin: 0 0 18px;
+      font-size: 34px;
+      letter-spacing: -0.05em;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    .field input {
+      width: 100%;
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      background: var(--panel-soft);
+      color: var(--text);
+      outline: none;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .sidebar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      position: sticky;
+      top: 96px;
+    }
+
+    .section-tab {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      text-align: left;
+      padding: 0 14px;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .section-tab.active {
+      background: var(--dark);
+      color: var(--bg);
+    }
+
+    body.dark .section-tab.active {
+      background: #f8fafc;
+      color: #020617;
+    }
+
+    .page {
+      max-width: 1170px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #111827 0%, #1f2937 70%, #314300 100%);
+      color: white;
+      padding: 34px 28px;
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 56px);
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .module-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .module-tab {
+      height: 38px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e5e7eb;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+
+    .module-tab.active {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .grid {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 410px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .card-header { padding: 20px 22px 0; }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .card-body { padding: 22px; }
+
+    .upload-box {
+      min-height: 190px;
+      border: 1.5px dashed var(--border-strong);
+      background: var(--panel-soft);
+      border-radius: 16px;
+      padding: 22px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .upload-box:hover,
+    .upload-box.dragover {
+      border-color: var(--blue);
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .upload-box.loaded {
+      border-style: solid;
+      border-color: var(--border);
+      background: var(--panel-soft);
+    }
+
+    .upload-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #eef2f7;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    body.dark .upload-icon {
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+
+    .upload-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .upload-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .upload-btn {
+      height: 34px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--blue);
+      background: var(--panel);
+      padding: 0 14px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-status {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+
+    .file-name {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+      max-width: 100%;
+    }
+
+    input[type="file"] { display: none; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge-green { background: #ecfccb; color: #3f6212; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+
+    body.dark .badge-gray {
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .button-row.two { grid-template-columns: 1fr 1fr; }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 13px;
+      height: 46px;
+      padding: 0 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      transition: 0.2s ease;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .btn-primary { background: var(--dark); color: var(--bg); }
+
+    body.dark .btn-primary {
+      background: #f8fafc;
+      color: #020617;
+    }
+
+    .btn-green { background: var(--green); color: white; }
+    .btn-red { background: var(--red); color: white; }
+    .btn-light { background: var(--panel-soft); color: var(--text); border: 1px solid var(--border); }
+
+    .btn-primary:hover:not(:disabled),
+    .btn-green:hover:not(:disabled),
+    .btn-light:hover:not(:disabled),
+    .btn-red:hover:not(:disabled),
+    .upload-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      display: none;
+    }
+
+    .message.show { display: block; }
+    .message.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .message.ok { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .message.warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metrics.three { grid-template-columns: repeat(3, 1fr); }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 112px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 34px;
+      letter-spacing: -0.06em;
+    }
+
+    .metric.green strong { color: var(--green-dark); }
+    .metric.red strong { color: var(--red); }
+    .metric.blue strong { color: var(--blue); }
+    .metric.amber strong { color: var(--amber); }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 6px 0 16px;
+    }
+
+    .tab {
+      height: 38px;
+      border-radius: 999px;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0 14px;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      background: var(--dark);
+      color: var(--bg);
+      border-color: var(--dark);
+    }
+
+    body.dark .tab.active {
+      background: #f8fafc;
+      color: #020617;
+    }
+
+    .table-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .table-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .download-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .download-actions button {
+      height: 38px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+      max-height: 560px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 900px;
+    }
+
+    thead { position: sticky; top: 0; z-index: 2; }
+
+    th {
+      background: var(--panel-soft);
+      color: var(--text);
+      text-align: left;
+      font-size: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--muted);
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    tr:hover td { background: rgba(37, 99, 235, 0.05); }
+
+    .empty {
+      padding: 45px 18px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      background: var(--panel-soft);
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.45;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1100px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; display: flex; gap: 8px; overflow-x: auto; }
+      .section-tab { min-width: 110px; margin-bottom: 0; text-align: center; }
+      .grid { grid-template-columns: 1fr; }
+      .metrics, .metrics.three { grid-template-columns: 1fr; }
+      header { padding: 12px 18px; }
+    }
+
+    @media (max-width: 640px) {
+      main { width: min(100% - 22px, 1380px); }
+      .hero { padding: 24px; }
+      .version { display: none; }
+      .button-row.two { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
+
 <body>
   <header>
-    <div class="brand"><div class="brand-icon">F</div><div>Pendiente RIAL<small>Base acumulada · Envío semanal</small></div></div>
-    <div class="header-actions"><div class="version">V2.0 local</div><button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button></div>
+    <div class="brand">
+      <div class="brand-icon">F</div>
+      <div>
+        Fabia
+        <small>Firestore · Base RIAL</small>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="version">V2.2 Firestore</div>
+      <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
+    </div>
   </header>
 
   <main>
-    <div class="app-layout">
-      <aside class="sidebar">
-        <button class="section-tab active" data-linea="infantil">INFANTIL</button>
-        <button class="section-tab" data-linea="hombre">HOMBRE</button>
-        <button class="section-tab" data-linea="mujer">MUJER</button>
-      </aside>
+    <section id="appView">
+      <div class="app-layout">
+        <aside class="sidebar">
+          <button class="section-tab active" data-linea="infantil">INFANTIL</button>
+          <button class="section-tab" data-linea="hombre">HOMBRE</button>
+          <button class="section-tab" data-linea="mujer">MUJER</button>
+        </aside>
 
-      <div class="page">
-        <section class="hero">
-          <h1>Pendiente RIAL</h1>
-          <div class="module-tabs">
-            <button class="module-tab active" data-module="generar">Generar envío</button>
-            <button class="module-tab" data-module="actualizar">Actualizar base</button>
-            <button class="module-tab" data-module="subclases">Subclases</button>
-          </div>
-        </section>
+        <div class="page">
+          <section class="hero">
+            <h1>Fabia</h1>
+            <div class="module-tabs">
+              <button class="module-tab active" data-module="generar">Generar envío</button>
+              <button class="module-tab" data-module="actualizar">Actualizar base</button>
+              <button class="module-tab" data-module="subclases">Subclases</button>
+            </div>
+          </section>
 
-        <section id="moduleGenerar" class="module-section">
-          <section class="grid">
-            <aside class="card">
-              <div class="card-header"><h2>Reporte interno</h2></div>
-              <div class="card-body">
-                <label class="upload-box" id="boxReporte" for="fileReporte"><span class="upload-status badge badge-gray" id="badgeReporte">Pendiente</span><div class="upload-icon">☁</div><div class="upload-title">Reporte</div><div class="upload-subtitle">Arrastre el archivo aquí</div><div class="upload-btn">SELECCIONAR ARCHIVO</div><div class="file-name" id="nameReporte">CSV / XLS / XLSX</div></label>
-                <input id="fileReporte" type="file" accept=".csv,.xlsx,.xls" />
-                <div class="button-row"><button class="btn-primary" id="btnGenerar" disabled>Generar</button><button class="btn-light" id="btnLimpiarGenerar">Limpiar</button></div>
-                <div class="message" id="msgGenerar"></div>
-              </div>
-            </aside>
-            <section>
-              <div class="metrics"><div class="metric"><span>Reporte</span><strong id="mReporte">0</strong></div><div class="metric green"><span>Formato RIAL</span><strong id="mFormatoRial">0</strong></div><div class="metric blue"><span>Ya trabajado</span><strong id="mYaTrabajado">0</strong></div><div class="metric amber"><span>Sin tipo/género</span><strong id="mSinTipo">0</strong></div></div>
-              <div class="card"><div class="card-body"><div class="table-actions"><div class="table-title"><h2 id="titleGenerar">Resultado</h2><p id="subtitleGenerar">Sin datos.</p></div><div class="download-actions"><button class="btn-green" id="btnDescargarFormato" disabled>Formato RIAL</button><button class="btn-light" id="btnDescargarYaTrabajado" disabled>Ya trabajado</button><button class="btn-light" id="btnDescargarSinTipo" disabled>Sin tipo/género</button></div></div><div class="tabs"><button class="tab active" data-generar-view="formato">Formato RIAL</button><button class="tab" data-generar-view="yaTrabajado">Ya trabajado</button><button class="tab" data-generar-view="sinTipo">Sin tipo/género</button></div><div id="emptyGenerar" class="empty">Carga reporte y genera.</div><div id="tableGenerar" class="table-wrap hidden"></div><div class="footer-note" id="noteGenerar">Vista previa: máximo 500 filas.</div></div></div>
+          <section id="moduleGenerar" class="module-section">
+            <section class="grid">
+              <aside class="card">
+                <div class="card-header"><h2>Reporte interno</h2></div>
+                <div class="card-body">
+                  <label class="upload-box" id="boxReporte" for="fileReporte">
+                    <span class="upload-status badge badge-gray" id="badgeReporte">Pendiente</span>
+                    <div class="upload-icon">☁</div>
+                    <div class="upload-title">Reporte</div>
+                    <div class="upload-subtitle">Fotografía interna</div>
+                    <div class="upload-btn">SELECCIONAR ARCHIVO</div>
+                    <div class="file-name" id="nameReporte">CSV / XLS / XLSX</div>
+                  </label>
+                  <input id="fileReporte" type="file" accept=".csv,.xlsx,.xls" />
+
+                  <div class="button-row">
+                    <button class="btn-primary" id="btnGenerar" disabled>Generar</button>
+                    <button class="btn-light" id="btnLimpiarGenerar">Limpiar</button>
+                  </div>
+
+                  <div class="message" id="msgGenerar"></div>
+                </div>
+              </aside>
+
+              <section>
+                <div class="metrics">
+                  <div class="metric"><span>Reporte</span><strong id="mReporte">0</strong></div>
+                  <div class="metric green"><span>Formato RIAL</span><strong id="mFormatoRial">0</strong></div>
+                  <div class="metric blue"><span>Ya trabajado</span><strong id="mYaTrabajado">0</strong></div>
+                  <div class="metric amber"><span>Sin tipo/género</span><strong id="mSinTipo">0</strong></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+                    <div class="table-actions">
+                      <div class="table-title">
+                        <h2 id="titleGenerar">Resultado</h2>
+                        <p id="subtitleGenerar">Sin datos.</p>
+                      </div>
+                      <div class="download-actions">
+                        <button class="btn-green" id="btnDescargarFormato" disabled>Formato RIAL</button>
+                        <button class="btn-light" id="btnDescargarYaTrabajado" disabled>Ya trabajado</button>
+                        <button class="btn-light" id="btnDescargarSinTipo" disabled>Sin tipo/género</button>
+                      </div>
+                    </div>
+
+                    <div class="tabs">
+                      <button class="tab active" data-generar-view="formato">Formato RIAL</button>
+                      <button class="tab" data-generar-view="yaTrabajado">Ya trabajado</button>
+                      <button class="tab" data-generar-view="sinTipo">Sin tipo/género</button>
+                    </div>
+
+                    <div id="emptyGenerar" class="empty">Carga reporte y genera.</div>
+                    <div id="tableGenerar" class="table-wrap hidden"></div>
+                    <div class="footer-note" id="noteGenerar">Vista previa: máximo 500 filas.</div>
+                  </div>
+                </div>
+              </section>
             </section>
           </section>
-        </section>
 
-        <section id="moduleActualizar" class="module-section hidden">
-          <section class="grid">
-            <aside class="card">
-              <div class="card-header"><h2>Base RIAL</h2></div>
-              <div class="card-body">
-                <label class="upload-box" id="boxRial" for="fileRial"><span class="upload-status badge badge-gray" id="badgeRial">Pendiente</span><div class="upload-icon">☁</div><div class="upload-title">RIAL</div><div class="upload-subtitle">Base o delta semanal</div><div class="upload-btn">SELECCIONAR ARCHIVO</div><div class="file-name" id="nameRial">CSV / XLS / XLSX</div></label>
-                <input id="fileRial" type="file" accept=".csv,.xlsx,.xls" />
-                <div class="button-row"><button class="btn-primary" id="btnActualizarBase" disabled>Actualizar base</button><button class="btn-light" id="btnLimpiarRial">Limpiar</button></div>
-                <div class="button-row two"><button class="btn-light" id="btnExportarBase">Exportar base</button><button class="btn-red" id="btnBorrarBase">Borrar base</button></div>
-                <div class="message" id="msgRial"></div>
-              </div>
-            </aside>
-            <section>
-              <div class="metrics three"><div class="metric green"><span>Total base</span><strong id="mBaseTotal">0</strong></div><div class="metric blue"><span>Nuevos</span><strong id="mBaseNuevos">0</strong></div><div class="metric amber"><span>Actualizados</span><strong id="mBaseActualizados">0</strong></div></div>
-              <div class="card"><div class="card-body"><div class="table-actions"><div class="table-title"><h2>Base RIAL</h2><p id="subtitleBase">Sin datos.</p></div></div><div id="emptyBase" class="empty">Sin base cargada.</div><div id="tableBase" class="table-wrap hidden"></div><div class="footer-note" id="noteBase">Vista previa: máximo 500 filas.</div></div></div>
+          <section id="moduleActualizar" class="module-section hidden">
+            <section class="grid">
+              <aside class="card">
+                <div class="card-header"><h2>Base RIAL</h2></div>
+                <div class="card-body">
+                  <label class="upload-box" id="boxRial" for="fileRial">
+                    <span class="upload-status badge badge-gray" id="badgeRial">Pendiente</span>
+                    <div class="upload-icon">☁</div>
+                    <div class="upload-title">RIAL</div>
+                    <div class="upload-subtitle">Base o delta semanal</div>
+                    <div class="upload-btn">SELECCIONAR ARCHIVO</div>
+                    <div class="file-name" id="nameRial">CSV / XLS / XLSX</div>
+                  </label>
+                  <input id="fileRial" type="file" accept=".csv,.xlsx,.xls" />
+
+                  <div class="button-row">
+                    <button class="btn-primary" id="btnActualizarBase" disabled>Actualizar base</button>
+                    <button class="btn-light" id="btnLimpiarRial">Limpiar</button>
+                  </div>
+
+                  <div class="button-row two">
+                    <button class="btn-light" id="btnExportarBase">Exportar base</button>
+                    <button class="btn-red" id="btnBorrarBase">Borrar base</button>
+                  </div>
+
+                  <div class="message" id="msgRial"></div>
+                </div>
+              </aside>
+
+              <section>
+                <div class="metrics three">
+                  <div class="metric green"><span>Total base</span><strong id="mBaseTotal">0</strong></div>
+                  <div class="metric blue"><span>Nuevos</span><strong id="mBaseNuevos">0</strong></div>
+                  <div class="metric amber"><span>Actualizados</span><strong id="mBaseActualizados">0</strong></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+                    <div class="table-actions">
+                      <div class="table-title">
+                        <h2>Base RIAL</h2>
+                        <p id="subtitleBase">Sin datos.</p>
+                      </div>
+                    </div>
+                    <div id="emptyBase" class="empty">Sin base cargada.</div>
+                    <div id="tableBase" class="table-wrap hidden"></div>
+                    <div class="footer-note" id="noteBase">Vista previa: máximo 500 filas.</div>
+                  </div>
+                </div>
+              </section>
             </section>
           </section>
-        </section>
 
-        <section id="moduleSubclases" class="module-section hidden">
-          <section class="grid">
-            <aside class="card">
-              <div class="card-header"><h2>Tabla subclases</h2></div>
-              <div class="card-body">
-                <label class="upload-box" id="boxSubclases" for="fileSubclases"><span class="upload-status badge badge-gray" id="badgeSubclases">Pendiente</span><div class="upload-icon">☁</div><div class="upload-title">Subclases</div><div class="upload-subtitle">SUBCLASE · GENERO · TIPO</div><div class="upload-btn">SELECCIONAR ARCHIVO</div><div class="file-name" id="nameSubclases">CSV / XLS / XLSX</div></label>
-                <input id="fileSubclases" type="file" accept=".csv,.xlsx,.xls" />
-                <div class="button-row"><button class="btn-primary" id="btnActualizarSubclases" disabled>Actualizar subclases</button><button class="btn-light" id="btnLimpiarSubclases">Limpiar</button></div>
-                <div class="button-row two"><button class="btn-light" id="btnExportarSubclases">Exportar</button><button class="btn-red" id="btnBorrarSubclases">Borrar</button></div>
-                <div class="message" id="msgSubclases"></div>
-              </div>
-            </aside>
-            <section>
-              <div class="metrics three"><div class="metric green"><span>Total subclases</span><strong id="mSubclasesTotal">0</strong></div><div class="metric blue"><span>Nuevas</span><strong id="mSubclasesNuevas">0</strong></div><div class="metric amber"><span>Actualizadas</span><strong id="mSubclasesActualizadas">0</strong></div></div>
-              <div class="card"><div class="card-body"><div class="table-actions"><div class="table-title"><h2>Subclases</h2><p id="subtitleSubclases">Sin datos.</p></div></div><div id="emptySubclases" class="empty">Sin subclases cargadas.</div><div id="tableSubclases" class="table-wrap hidden"></div><div class="footer-note" id="noteSubclases">Vista previa: máximo 500 filas.</div></div></div>
+          <section id="moduleSubclases" class="module-section hidden">
+            <section class="grid">
+              <aside class="card">
+                <div class="card-header"><h2>Tabla subclases</h2></div>
+                <div class="card-body">
+                  <label class="upload-box" id="boxSubclases" for="fileSubclases">
+                    <span class="upload-status badge badge-gray" id="badgeSubclases">Pendiente</span>
+                    <div class="upload-icon">☁</div>
+                    <div class="upload-title">Subclases</div>
+                    <div class="upload-subtitle">SUBCLASE · GENERO · TIPO</div>
+                    <div class="upload-btn">SELECCIONAR ARCHIVO</div>
+                    <div class="file-name" id="nameSubclases">CSV / XLS / XLSX</div>
+                  </label>
+                  <input id="fileSubclases" type="file" accept=".csv,.xlsx,.xls" />
+
+                  <div class="button-row">
+                    <button class="btn-primary" id="btnActualizarSubclases" disabled>Actualizar subclases</button>
+                    <button class="btn-light" id="btnLimpiarSubclases">Limpiar</button>
+                  </div>
+
+                  <div class="button-row two">
+                    <button class="btn-light" id="btnExportarSubclases">Exportar</button>
+                    <button class="btn-red" id="btnBorrarSubclases">Borrar</button>
+                  </div>
+
+                  <div class="message" id="msgSubclases"></div>
+                </div>
+              </aside>
+
+              <section>
+                <div class="metrics three">
+                  <div class="metric green"><span>Total subclases</span><strong id="mSubclasesTotal">0</strong></div>
+                  <div class="metric blue"><span>Nuevas</span><strong id="mSubclasesNuevas">0</strong></div>
+                  <div class="metric amber"><span>Actualizadas</span><strong id="mSubclasesActualizadas">0</strong></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-body">
+                    <div class="table-actions">
+                      <div class="table-title">
+                        <h2>Subclases</h2>
+                        <p id="subtitleSubclases">Sin datos.</p>
+                      </div>
+                    </div>
+                    <div id="emptySubclases" class="empty">Sin subclases cargadas.</div>
+                    <div id="tableSubclases" class="table-wrap hidden"></div>
+                    <div class="footer-note" id="noteSubclases">Vista previa: máximo 500 filas.</div>
+                  </div>
+                </div>
+              </section>
             </section>
           </section>
-        </section>
+        </div>
       </div>
-    </div>
+    </section>
   </main>
 
-  <script>
-    const DB_NAME = "pendiente_rial_v2";
-    const DB_VERSION = 1;
-    let db = null;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      setDoc,
+      deleteDoc,
+      writeBatch,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBHPwAbzfYb0FpO4MiQrQEsnPGWJg-Dl0g",
+      authDomain: "fabia-50760.firebaseapp.com",
+      projectId: "fabia-50760",
+      storageBucket: "fabia-50760.firebasestorage.app",
+      messagingSenderId: "346920937354",
+      appId: "1:346920937354:web:bc7b8ba21b9e502a744a73"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     let lineaActiva = "infantil";
+    let moduloActivo = "generar";
+
     let reporteRows = [];
     let rialRows = [];
     let subclasesRows = [];
+
     let resultadoFormatoRial = [];
     let resultadoYaTrabajado = [];
     let resultadoSinTipo = [];
     let vistaGenerar = "formato";
-    const $ = function(id){ return document.getElementById(id); };
 
-    document.addEventListener("DOMContentLoaded", async function(){
-      iniciarTema();
-      prepararEventos();
-      configurarDragDrop("boxReporte", "fileReporte");
-      configurarDragDrop("boxRial", "fileRial");
-      configurarDragDrop("boxSubclases", "fileSubclases");
-      db = await abrirDB();
+    const $ = (id) => document.getElementById(id);
+
+    iniciarTema();
+    prepararEventos();
+    configurarDragDrop("boxReporte", "fileReporte");
+    configurarDragDrop("boxRial", "fileRial");
+    configurarDragDrop("boxSubclases", "fileSubclases");
+
+    (async () => {
       await refrescarBase();
       await refrescarSubclases();
-    });
+    })();
 
-    function prepararEventos(){
+    function prepararEventos() {
       $("themeToggle").addEventListener("click", alternarTema);
-      document.querySelectorAll(".section-tab").forEach(function(tab){
-        tab.addEventListener("click", async function(){
-          document.querySelectorAll(".section-tab").forEach(function(t){ t.classList.remove("active"); });
+
+      document.querySelectorAll(".section-tab").forEach((tab) => {
+        tab.addEventListener("click", async () => {
+          document.querySelectorAll(".section-tab").forEach((t) => t.classList.remove("active"));
           tab.classList.add("active");
           lineaActiva = tab.dataset.linea;
-          limpiarGenerar(false); limpiarRial(false); limpiarSubclases(false);
-          await refrescarBase(); await refrescarSubclases();
+
+          limpiarGenerar(false);
+          limpiarRial(false);
+          limpiarSubclases(false);
+
+          await refrescarBase();
+          await refrescarSubclases();
         });
       });
-      document.querySelectorAll(".module-tab").forEach(function(tab){
-        tab.addEventListener("click", function(){
-          document.querySelectorAll(".module-tab").forEach(function(t){ t.classList.remove("active"); });
-          tab.classList.add("active"); mostrarModulo(tab.dataset.module);
+
+      document.querySelectorAll(".module-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".module-tab").forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          moduloActivo = tab.dataset.module;
+          mostrarModulo(moduloActivo);
         });
       });
-      document.querySelectorAll("[data-generar-view]").forEach(function(tab){
-        tab.addEventListener("click", function(){
-          document.querySelectorAll("[data-generar-view]").forEach(function(t){ t.classList.remove("active"); });
-          tab.classList.add("active"); vistaGenerar = tab.dataset.generarView; renderVistaGenerar();
+
+      document.querySelectorAll("[data-generar-view]").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll("[data-generar-view]").forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          vistaGenerar = tab.dataset.generarView;
+          renderVistaGenerar();
         });
       });
+
       $("fileReporte").addEventListener("change", onReporteFile);
       $("fileRial").addEventListener("change", onRialFile);
       $("fileSubclases").addEventListener("change", onSubclasesFile);
+
       $("btnGenerar").addEventListener("click", generarEnvio);
-      $("btnLimpiarGenerar").addEventListener("click", function(){ limpiarGenerar(true); });
+      $("btnLimpiarGenerar").addEventListener("click", () => limpiarGenerar(true));
+
       $("btnActualizarBase").addEventListener("click", actualizarBaseRial);
-      $("btnLimpiarRial").addEventListener("click", function(){ limpiarRial(true); });
+      $("btnLimpiarRial").addEventListener("click", () => limpiarRial(true));
       $("btnExportarBase").addEventListener("click", exportarBaseRial);
       $("btnBorrarBase").addEventListener("click", borrarBaseRial);
+
       $("btnActualizarSubclases").addEventListener("click", actualizarSubclases);
-      $("btnLimpiarSubclases").addEventListener("click", function(){ limpiarSubclases(true); });
+      $("btnLimpiarSubclases").addEventListener("click", () => limpiarSubclases(true));
       $("btnExportarSubclases").addEventListener("click", exportarSubclases);
       $("btnBorrarSubclases").addEventListener("click", borrarSubclases);
-      $("btnDescargarFormato").addEventListener("click", function(){ descargarExcel(resultadoFormatoRial, "formato_rial"); });
-      $("btnDescargarYaTrabajado").addEventListener("click", function(){ descargarExcel(resultadoYaTrabajado, "ya_trabajado_rial"); });
-      $("btnDescargarSinTipo").addEventListener("click", function(){ descargarExcel(resultadoSinTipo, "sin_tipo_genero"); });
+
+      $("btnDescargarFormato").addEventListener("click", () => descargarExcel(resultadoFormatoRial, "formato_rial"));
+      $("btnDescargarYaTrabajado").addEventListener("click", () => descargarExcel(resultadoYaTrabajado, "ya_trabajado_rial"));
+      $("btnDescargarSinTipo").addEventListener("click", () => descargarExcel(resultadoSinTipo, "sin_tipo_genero"));
     }
 
-    function mostrarModulo(moduleName){
+    function mostrarModulo(moduleName) {
       $("moduleGenerar").classList.toggle("hidden", moduleName !== "generar");
       $("moduleActualizar").classList.toggle("hidden", moduleName !== "actualizar");
       $("moduleSubclases").classList.toggle("hidden", moduleName !== "subclases");
     }
-    function iniciarTema(){
-      const savedTheme = localStorage.getItem("rialTheme");
-      if(savedTheme === "dark"){ document.body.classList.add("dark"); $("themeToggle").textContent = "☀️"; }
-      else { document.body.classList.remove("dark"); $("themeToggle").textContent = "🌙"; }
+
+    function iniciarTema() {
+      const savedTheme = localStorage.getItem("fabiaTheme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+        $("themeToggle").textContent = "☀️";
+      } else {
+        document.body.classList.remove("dark");
+        $("themeToggle").textContent = "🌙";
+      }
     }
-    function alternarTema(){
+
+    function alternarTema() {
       document.body.classList.toggle("dark");
       const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("rialTheme", isDark ? "dark" : "light");
+      localStorage.setItem("fabiaTheme", isDark ? "dark" : "light");
       $("themeToggle").textContent = isDark ? "☀️" : "🌙";
     }
-    function configurarDragDrop(boxId,inputId){
-      const box=$(boxId); const input=$(inputId);
-      ["dragenter","dragover"].forEach(function(eventName){ box.addEventListener(eventName,function(event){ event.preventDefault(); event.stopPropagation(); box.classList.add("dragover"); }); });
-      ["dragleave","drop"].forEach(function(eventName){ box.addEventListener(eventName,function(event){ event.preventDefault(); event.stopPropagation(); box.classList.remove("dragover"); }); });
-      box.addEventListener("drop",function(event){ const file=event.dataTransfer.files[0]; if(!file)return; const dt=new DataTransfer(); dt.items.add(file); input.files=dt.files; input.dispatchEvent(new Event("change")); });
-    }
 
-    function abrirDB(){
-      return new Promise(function(resolve,reject){
-        const request=indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded=function(event){
-          const database=event.target.result;
-          if(!database.objectStoreNames.contains("rial")){ const store=database.createObjectStore("rial",{keyPath:"id"}); store.createIndex("linea","linea",{unique:false}); store.createIndex("sku","sku",{unique:false}); }
-          if(!database.objectStoreNames.contains("subclases")){ const store=database.createObjectStore("subclases",{keyPath:"id"}); store.createIndex("linea","linea",{unique:false}); store.createIndex("subclase","subclase",{unique:false}); }
-        };
-        request.onsuccess=function(){ resolve(request.result); };
-        request.onerror=function(){ reject(request.error); };
+    function configurarDragDrop(boxId, inputId) {
+      const box = $(boxId);
+      const input = $(inputId);
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        box.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          box.classList.add("dragover");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        box.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          box.classList.remove("dragover");
+        });
+      });
+
+      box.addEventListener("drop", (event) => {
+        const file = event.dataTransfer.files[0];
+        if (!file) return;
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+        input.dispatchEvent(new Event("change"));
       });
     }
-    function tx(storeName,mode){ return db.transaction(storeName, mode || "readonly").objectStore(storeName); }
-    function getAllByLinea(storeName){
-      return new Promise(function(resolve,reject){ const index=tx(storeName,"readonly").index("linea"); const request=index.getAll(lineaActiva); request.onsuccess=function(){ resolve(request.result || []); }; request.onerror=function(){ reject(request.error); }; });
-    }
-    function putItem(storeName,item){
-      return new Promise(function(resolve,reject){ const request=tx(storeName,"readwrite").put(item); request.onsuccess=function(){ resolve(); }; request.onerror=function(){ reject(request.error); }; });
-    }
-    function getItem(storeName,id){
-      return new Promise(function(resolve,reject){ const request=tx(storeName,"readonly").get(id); request.onsuccess=function(){ resolve(request.result || null); }; request.onerror=function(){ reject(request.error); }; });
-    }
-    async function deleteByLinea(storeName){
-      const items=await getAllByLinea(storeName);
-      return new Promise(function(resolve,reject){ const transaction=db.transaction(storeName,"readwrite"); const store=transaction.objectStore(storeName); items.forEach(function(item){ store.delete(item.id); }); transaction.oncomplete=function(){ resolve(); }; transaction.onerror=function(){ reject(transaction.error); }; });
+
+    async function onReporteFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        reporteRows = await leerArchivo(file);
+        marcarArchivo("Reporte", file.name, reporteRows.length);
+        $("btnGenerar").disabled = reporteRows.length === 0;
+        showMessage("msgGenerar", "ok", "Reporte cargado.");
+      } catch (error) {
+        console.error(error);
+        reporteRows = [];
+        showMessage("msgGenerar", "error", "Error al leer reporte.");
+      }
     }
 
-    async function onReporteFile(event){
-      const file=event.target.files[0]; if(!file)return;
-      try{ reporteRows=await leerArchivo(file); marcarArchivo("Reporte",file.name,reporteRows.length); $("btnGenerar").disabled=reporteRows.length===0; showMessage("msgGenerar","ok","Reporte cargado."); }
-      catch(error){ console.error(error); reporteRows=[]; showMessage("msgGenerar","error","Error al leer reporte."); }
-    }
-    async function onRialFile(event){
-      const file=event.target.files[0]; if(!file)return;
-      try{ rialRows=await leerArchivo(file); marcarArchivo("Rial",file.name,rialRows.length); $("btnActualizarBase").disabled=rialRows.length===0; showMessage("msgRial","ok","RIAL cargado."); }
-      catch(error){ console.error(error); rialRows=[]; showMessage("msgRial","error","Error al leer RIAL."); }
-    }
-    async function onSubclasesFile(event){
-      const file=event.target.files[0]; if(!file)return;
-      try{ subclasesRows=await leerArchivo(file); marcarArchivo("Subclases",file.name,subclasesRows.length); $("btnActualizarSubclases").disabled=subclasesRows.length===0; showMessage("msgSubclases","ok","Subclases cargadas."); }
-      catch(error){ console.error(error); subclasesRows=[]; showMessage("msgSubclases","error","Error al leer subclases."); }
-    }
-    function marcarArchivo(tipo,nombre,total){
-      const config={Reporte:["boxReporte","badgeReporte","nameReporte"],Rial:["boxRial","badgeRial","nameRial"],Subclases:["boxSubclases","badgeSubclases","nameSubclases"]};
-      const item=config[tipo];
-      $(item[0]).classList.add("loaded"); $(item[1]).className="upload-status badge badge-green"; $(item[1]).textContent="Cargado"; $(item[2]).textContent=nombre+" · "+total.toLocaleString("es-CL")+" filas";
+    async function onRialFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        rialRows = await leerArchivo(file);
+        marcarArchivo("Rial", file.name, rialRows.length);
+        $("btnActualizarBase").disabled = rialRows.length === 0;
+        showMessage("msgRial", "ok", "RIAL cargado.");
+      } catch (error) {
+        console.error(error);
+        rialRows = [];
+        showMessage("msgRial", "error", "Error al leer RIAL.");
+      }
     }
 
-    async function leerArchivo(file){
-      const arrayBuffer=await file.arrayBuffer();
-      const workbook=XLSX.read(arrayBuffer,{type:"array",raw:false,cellDates:false});
-      const worksheet=workbook.Sheets[workbook.SheetNames[0]];
-      const matrix=XLSX.utils.sheet_to_json(worksheet,{header:1,defval:"",raw:false});
-      const headerIndex=detectarFilaHeader(matrix);
-      const headers=(matrix[headerIndex] || []).map(function(h){ return String(h || "").trim(); });
-      const rows=[];
-      for(let i=headerIndex+1;i<matrix.length;i++){
-        const rowArray=matrix[i]; const row={};
-        headers.forEach(function(header,index){ if(header !== ""){ const value=rowArray[index] || ""; row[header]=typeof value === "string" ? value.trim() : value; } });
-        if(Object.values(row).some(function(value){ return String(value || "").trim() !== ""; })){ rows.push(row); }
+    async function onSubclasesFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        subclasesRows = await leerArchivo(file);
+        marcarArchivo("Subclases", file.name, subclasesRows.length);
+        $("btnActualizarSubclases").disabled = subclasesRows.length === 0;
+        showMessage("msgSubclases", "ok", "Subclases cargadas.");
+      } catch (error) {
+        console.error(error);
+        subclasesRows = [];
+        showMessage("msgSubclases", "error", "Error al leer subclases.");
+      }
+    }
+
+    function marcarArchivo(tipo, nombre, total) {
+      const config = {
+        Reporte: ["boxReporte", "badgeReporte", "nameReporte"],
+        Rial: ["boxRial", "badgeRial", "nameRial"],
+        Subclases: ["boxSubclases", "badgeSubclases", "nameSubclases"]
+      };
+      const [boxId, badgeId, nameId] = config[tipo];
+      $(boxId).classList.add("loaded");
+      $(badgeId).className = "upload-status badge badge-green";
+      $(badgeId).textContent = "Cargado";
+      $(nameId).textContent = `${nombre} · ${total.toLocaleString("es-CL")} filas`;
+    }
+
+    async function leerArchivo(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array", raw: false, cellDates: false });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const matrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "", raw: false });
+      const headerIndex = detectarFilaHeader(matrix);
+      const headers = matrix[headerIndex].map((h) => String(h ?? "").trim());
+      const rows = [];
+
+      for (let i = headerIndex + 1; i < matrix.length; i++) {
+        const rowArray = matrix[i];
+        const row = {};
+        headers.forEach((header, index) => {
+          if (header !== "") {
+            const value = rowArray[index] ?? "";
+            row[header] = typeof value === "string" ? value.trim() : value;
+          }
+        });
+        if (Object.values(row).some((value) => String(value ?? "").trim() !== "")) rows.push(row);
       }
       return rows;
     }
-    function detectarFilaHeader(matrix){
-      const limit=Math.min(matrix.length,25);
-      for(let i=0;i<limit;i++){
-        const row=matrix[i] || [];
-        const headers=row.map(function(cell){ return normalizarHeader(cell); });
-        const tieneSku=headers.includes("sku");
-        const tieneMarca=headers.includes("marca");
-        const tieneSubclase=headers.includes("subclase");
-        const tieneVista=headers.includes("vista");
-        if(tieneSku && (tieneMarca || tieneSubclase || tieneVista)) return i;
+
+    function detectarFilaHeader(matrix) {
+      const limit = Math.min(matrix.length, 25);
+      for (let i = 0; i < limit; i++) {
+        const row = matrix[i] || [];
+        const headersNormalizados = row.map((cell) => normalizarHeader(cell));
+        const tieneSku = headersNormalizados.includes("sku");
+        const tieneMarca = headersNormalizados.includes("marca");
+        const tieneSubclase = headersNormalizados.includes("subclase");
+        const tieneVista = headersNormalizados.includes("vista");
+        if (tieneSku && (tieneMarca || tieneSubclase || tieneVista)) return i;
       }
       return 0;
     }
 
-    async function actualizarBaseRial(){
-      try{
-        if(!rialRows.length){ showMessage("msgRial","warn","Sin archivo."); return; }
-        const cols=detectarColumnasRial(rialRows);
-        if(!cols.sku){ showMessage("msgRial","error","Falta SKU."); return; }
-        let nuevos=0, actualizados=0; const vistos=new Set();
-        for(const row of rialRows){
-          const sku=normalizarSku(row[cols.sku]); if(!sku || vistos.has(sku)) continue; vistos.add(sku);
-          const id=crearId(lineaActiva,sku); const existente=await getItem("rial",id);
-          const item={id:id,linea:lineaActiva,sku:sku,marca:cols.marca?limpiarTexto(row[cols.marca]):"",genero:cols.genero?limpiarTexto(row[cols.genero]):"",tipo:cols.tipo?normalizarTipoPrenda(row[cols.tipo]):"",estado:cols.estado?limpiarTexto(row[cols.estado]):"",fechaEnvio:cols.fechaEnvio?limpiarTexto(row[cols.fechaEnvio]):"",fechaCarga:new Date().toISOString()};
-          await putItem("rial",item); if(existente) actualizados++; else nuevos++;
-        }
-        $("mBaseNuevos").textContent=nuevos.toLocaleString("es-CL"); $("mBaseActualizados").textContent=actualizados.toLocaleString("es-CL"); await refrescarBase(); showMessage("msgRial","ok","Base actualizada.");
-      } catch(error){ console.error(error); showMessage("msgRial","error","Error al actualizar base."); }
-    }
-    async function actualizarSubclases(){
-      try{
-        if(!subclasesRows.length){ showMessage("msgSubclases","warn","Sin archivo."); return; }
-        const cols=detectarColumnasSubclases(subclasesRows);
-        if(!cols.subclase || !cols.genero || !cols.tipo){ showMessage("msgSubclases","error","Faltan columnas."); return; }
-        let nuevas=0, actualizadas=0; const vistos=new Set();
-        for(const row of subclasesRows){
-          const subclase=normalizarSubclase(row[cols.subclase]); if(!subclase || vistos.has(subclase)) continue; vistos.add(subclase);
-          const id=crearId(lineaActiva,subclase); const existente=await getItem("subclases",id);
-          const tipoOriginal=limpiarTexto(row[cols.tipo]);
-          const item={id:id,linea:lineaActiva,subclase:subclase,genero:limpiarTexto(row[cols.genero]),tipo:normalizarTipoPrenda(tipoOriginal),tipoOriginal:tipoOriginal,fechaCarga:new Date().toISOString()};
-          await putItem("subclases",item); if(existente) actualizadas++; else nuevas++;
-        }
-        $("mSubclasesNuevas").textContent=nuevas.toLocaleString("es-CL"); $("mSubclasesActualizadas").textContent=actualizadas.toLocaleString("es-CL"); await refrescarSubclases(); showMessage("msgSubclases","ok","Subclases actualizadas.");
-      } catch(error){ console.error(error); showMessage("msgSubclases","error","Error al actualizar subclases."); }
+    function collectionName(base) {
+      return `${base}_${lineaActiva}`;
     }
 
-    async function generarEnvio(){
-      try{
-        if(!reporteRows.length){ showMessage("msgGenerar","warn","Sin reporte."); return; }
-        const cols=detectarColumnasReporte(reporteRows);
-        if(!cols.sku || !cols.marca || !cols.modeloColor || !cols.subclase){ showMessage("msgGenerar","error","Faltan columnas."); return; }
-        const baseRial=await getAllByLinea("rial"); const subclases=await getAllByLinea("subclases");
-        const skusRial=new Set(baseRial.map(function(item){ return normalizarSku(item.sku); }));
-        const mapaSubclases=new Map(subclases.map(function(item){ return [normalizarSubclase(item.subclase), item]; }));
-        const reporteNormalizado=reporteRows.map(function(row){
-          return {original:row,sku:normalizarSku(row[cols.sku]),modeloColor:normalizarModeloColor(row[cols.modeloColor]),subclase:normalizarSubclase(row[cols.subclase]),marca:limpiarTexto(row[cols.marca]),descripcion:cols.descripcion?limpiarTexto(row[cols.descripcion]):"",ambientado:cols.ambientado?normalizarValor(row[cols.ambientado]):"",fotosIa:cols.fotosIa?normalizarValor(row[cols.fotosIa]):""};
-        }).filter(function(row){ return row.sku !== ""; }).filter(function(row){ return debeQuedarPendienteInterno(row); });
-        const modelosColorYaTrabajados=new Set();
-        reporteNormalizado.forEach(function(row){ if(skusRial.has(row.sku)) modelosColorYaTrabajados.add(row.modeloColor); });
-        resultadoFormatoRial=[]; resultadoYaTrabajado=[]; resultadoSinTipo=[];
-        reporteNormalizado.forEach(function(row){
-          if(modelosColorYaTrabajados.has(row.modeloColor)){ resultadoYaTrabajado.push(Object.assign({},row.original,{ESTADO_CRUCE:"YA TRABAJADO RIAL"})); return; }
-          const datosTipo=obtenerGeneroTipo(row,mapaSubclases);
-          const filaRial={MARCA:row.marca,SKU:row.sku,GENERO:datosTipo.genero,TIPO:datosTipo.tipo};
-          if(!datosTipo.genero || !datosTipo.tipo){ resultadoSinTipo.push(Object.assign({},row.original,filaRial,{MOTIVO:(!datosTipo.genero && !datosTipo.tipo)?"SIN GENERO / TIPO":(!datosTipo.genero?"SIN GENERO":"SIN TIPO")})); }
-          else { resultadoFormatoRial.push(filaRial); }
+    function safeDocId(value) {
+      return encodeURIComponent(String(value ?? "").trim().toUpperCase().replaceAll("/", "-"));
+    }
+
+    async function actualizarBaseRial() {
+      try {
+        if (!rialRows.length) {
+          showMessage("msgRial", "warn", "Sin archivo.");
+          return;
+        }
+
+        const cols = detectarColumnasRial(rialRows);
+        if (!cols.sku) {
+          showMessage("msgRial", "error", "Falta SKU.");
+          return;
+        }
+
+        $("btnActualizarBase").disabled = true;
+        showMessage("msgRial", "warn", "Actualizando...");
+
+        const collName = collectionName("rial");
+        const existentes = await obtenerSetIds(collName);
+        const vistos = new Set();
+        const items = [];
+        let nuevos = 0;
+        let actualizados = 0;
+
+        for (const row of rialRows) {
+          const sku = normalizarSku(row[cols.sku]);
+          if (!sku || vistos.has(sku)) continue;
+          vistos.add(sku);
+
+          const id = safeDocId(sku);
+          if (existentes.has(id)) actualizados++;
+          else nuevos++;
+
+          items.push({
+            id,
+            SKU: sku,
+            MARCA: cols.marca ? limpiarTexto(row[cols.marca]) : "",
+            GENERO: cols.genero ? limpiarTexto(row[cols.genero]) : "",
+            TIPO: cols.tipo ? limpiarTexto(row[cols.tipo]) : "",
+            ESTADO: cols.estado ? limpiarTexto(row[cols.estado]) : "",
+            FECHA_ENVIO: cols.fechaEnvio ? limpiarTexto(row[cols.fechaEnvio]) : "",
+            LINEA: lineaActiva,
+            FECHA_CARGA: new Date().toISOString(),
+            updatedAt: serverTimestamp()
+          });
+        }
+
+        await batchSet(collName, items);
+
+        $("mBaseNuevos").textContent = nuevos.toLocaleString("es-CL");
+        $("mBaseActualizados").textContent = actualizados.toLocaleString("es-CL");
+        await refrescarBase();
+        showMessage("msgRial", "ok", "Base actualizada.");
+      } catch (error) {
+        console.error(error);
+        showMessage("msgRial", "error", "Error al actualizar base.");
+      } finally {
+        $("btnActualizarBase").disabled = rialRows.length === 0;
+      }
+    }
+
+    async function actualizarSubclases() {
+      try {
+        if (!subclasesRows.length) {
+          showMessage("msgSubclases", "warn", "Sin archivo.");
+          return;
+        }
+
+        const cols = detectarColumnasSubclases(subclasesRows);
+        if (!cols.subclase || !cols.tipo || !cols.genero) {
+          showMessage("msgSubclases", "error", "Faltan columnas.");
+          return;
+        }
+
+        $("btnActualizarSubclases").disabled = true;
+        showMessage("msgSubclases", "warn", "Actualizando...");
+
+        const collName = collectionName("subclases");
+        const existentes = await obtenerSetIds(collName);
+        const vistos = new Set();
+        const items = [];
+        let nuevas = 0;
+        let actualizadas = 0;
+
+        for (const row of subclasesRows) {
+          const subclase = normalizarSubclase(row[cols.subclase]);
+          if (!subclase || vistos.has(subclase)) continue;
+          vistos.add(subclase);
+
+          const id = safeDocId(subclase);
+          if (existentes.has(id)) actualizadas++;
+          else nuevas++;
+
+          items.push({
+            id,
+            SUBCLASE: subclase,
+            GENERO: limpiarTexto(row[cols.genero]),
+            TIPO: limpiarTexto(row[cols.tipo]),
+            LINEA: lineaActiva,
+            FECHA_CARGA: new Date().toISOString(),
+            updatedAt: serverTimestamp()
+          });
+        }
+
+        await batchSet(collName, items);
+
+        $("mSubclasesNuevas").textContent = nuevas.toLocaleString("es-CL");
+        $("mSubclasesActualizadas").textContent = actualizadas.toLocaleString("es-CL");
+        await refrescarSubclases();
+        showMessage("msgSubclases", "ok", "Subclases actualizadas.");
+      } catch (error) {
+        console.error(error);
+        showMessage("msgSubclases", "error", "Error al actualizar subclases.");
+      } finally {
+        $("btnActualizarSubclases").disabled = subclasesRows.length === 0;
+      }
+    }
+
+    async function obtenerSetIds(collName) {
+      const snapshot = await getDocs(collection(db, collName));
+      return new Set(snapshot.docs.map((d) => d.id));
+    }
+
+    async function batchSet(collName, items) {
+      const chunkSize = 450;
+      for (let i = 0; i < items.length; i += chunkSize) {
+        const batch = writeBatch(db);
+        const chunk = items.slice(i, i + chunkSize);
+        chunk.forEach((item) => {
+          const ref = doc(db, collName, item.id);
+          const data = { ...item };
+          delete data.id;
+          batch.set(ref, data, { merge: true });
         });
-        actualizarMetricasGenerar({reporte:reporteNormalizado.length,formato:resultadoFormatoRial.length,yaTrabajado:resultadoYaTrabajado.length,sinTipo:resultadoSinTipo.length});
-        activarDescargasGenerar(); vistaGenerar="formato"; document.querySelectorAll("[data-generar-view]").forEach(function(t){ t.classList.remove("active"); }); document.querySelector('[data-generar-view="formato"]').classList.add("active"); renderVistaGenerar(); showMessage("msgGenerar","ok","Archivo generado.");
-      } catch(error){ console.error(error); showMessage("msgGenerar","error","Error al generar."); }
+        await batch.commit();
+      }
     }
-    function debeQuedarPendienteInterno(row){ if(row.ambientado !== "") return !esValorUno(row.ambientado); if(row.fotosIa !== "") return !esValorTrue(row.fotosIa); return true; }
-    function obtenerGeneroTipo(row,mapaSubclases){
-      const porSubclase=mapaSubclases.get(row.subclase);
-      if(porSubclase){ return {genero:limpiarTexto(porSubclase.genero), tipo:limpiarTexto(porSubclase.tipo) || inferirTipo(row)}; }
-      return {genero:inferirGenero(row), tipo:inferirTipo(row)};
+
+    async function getCollectionData(collName) {
+      const snapshot = await getDocs(collection(db, collName));
+      return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
     }
-    function inferirGenero(row){ const texto=normalizarTextoBusqueda(row.descripcion+" "+row.subclase); if(texto.includes("NINA") || texto.includes("NIÑA")) return "NIÑA"; if(texto.includes("NINO") || texto.includes("NIÑO")) return "NIÑO"; if(lineaActiva==="hombre") return "HOMBRE"; if(lineaActiva==="mujer") return "MUJER"; return ""; }
-    function inferirTipo(row){ return normalizarTipoPrenda(row.descripcion+" "+row.subclase); }
-    function normalizarTipoPrenda(value){
-      const texto=normalizarTextoBusqueda(value);
-      if(!texto) return "";
-      if(texto.includes("JEAN") || texto.includes("PANTALON") || texto.includes("SHORT") || texto.includes("BERMUDA") || texto.includes("FALDA") || texto.includes("CALZA") || texto.includes("LEGGING") || texto.includes("BUZO") || texto.includes("JARDINERA")) return "TRONCO INFERIOR";
-      if(texto.includes("POLERA") || texto.includes("CAMISA") || texto.includes("BLUSA") || texto.includes("SWEATER") || texto.includes("CHAQUETA") || texto.includes("PARKA") || texto.includes("POLERON") || texto.includes("CHOMBA") || texto.includes("TOP") || texto.includes("BEATLE")) return "TRONCO SUPERIOR";
-      if(texto.includes("ZAPATO") || texto.includes("ZAPATILLA") || texto.includes("BOTA") || texto.includes("SANDALIA")) return "CALZADO";
-      if(texto.includes("VESTIDO") || texto.includes("ENTERITO") || texto.includes("CONJUNTO")) return "CUERPO COMPLETO";
-      if(texto==="TRONCO INFERIOR" || texto==="TRONCO SUPERIOR" || texto==="CALZADO" || texto==="CUERPO COMPLETO") return texto;
+
+    async function generarEnvio() {
+      try {
+        if (!reporteRows.length) {
+          showMessage("msgGenerar", "warn", "Sin reporte.");
+          return;
+        }
+
+        const cols = detectarColumnasReporte(reporteRows);
+        if (!cols.sku || !cols.marca || !cols.modeloColor || !cols.subclase) {
+          showMessage("msgGenerar", "error", "Faltan columnas.");
+          return;
+        }
+
+        $("btnGenerar").disabled = true;
+        showMessage("msgGenerar", "warn", "Generando...");
+
+        const baseRial = await getCollectionData(collectionName("rial"));
+        const subclases = await getCollectionData(collectionName("subclases"));
+
+        const skusRial = new Set(baseRial.map((item) => normalizarSku(item.SKU)));
+        const mapaSubclases = new Map(subclases.map((item) => [normalizarSubclase(item.SUBCLASE), item]));
+
+        const reporteNormalizado = reporteRows
+          .map((row) => {
+            const sku = normalizarSku(row[cols.sku]);
+            const modeloColor = normalizarModeloColor(row[cols.modeloColor]);
+            const subclase = normalizarSubclase(row[cols.subclase]);
+            const marca = limpiarTexto(row[cols.marca]);
+            const descripcion = cols.descripcion ? limpiarTexto(row[cols.descripcion]) : "";
+            const ambientado = cols.ambientado ? normalizarValor(row[cols.ambientado]) : "";
+            const fotosIa = cols.fotosIa ? normalizarValor(row[cols.fotosIa]) : "";
+
+            return { original: row, sku, modeloColor, subclase, marca, descripcion, ambientado, fotosIa };
+          })
+          .filter((row) => row.sku !== "")
+          .filter((row) => debeQuedarPendienteInterno(row));
+
+        const modelosColorYaTrabajados = new Set();
+
+        reporteNormalizado.forEach((row) => {
+          if (skusRial.has(row.sku)) modelosColorYaTrabajados.add(row.modeloColor);
+        });
+
+        resultadoFormatoRial = [];
+        resultadoYaTrabajado = [];
+        resultadoSinTipo = [];
+
+        reporteNormalizado.forEach((row) => {
+          if (modelosColorYaTrabajados.has(row.modeloColor)) {
+            resultadoYaTrabajado.push({ ...row.original, ESTADO_CRUCE: "YA TRABAJADO RIAL" });
+            return;
+          }
+
+          const datosTipo = obtenerGeneroTipo(row, mapaSubclases);
+          const filaRial = {
+            MARCA: row.marca,
+            SKU: row.sku,
+            GENERO: datosTipo.genero,
+            TIPO: datosTipo.tipo
+          };
+
+          if (!datosTipo.genero || !datosTipo.tipo) {
+            resultadoSinTipo.push({
+              ...row.original,
+              MARCA: row.marca,
+              SKU: row.sku,
+              GENERO: datosTipo.genero,
+              TIPO: datosTipo.tipo,
+              MOTIVO: !datosTipo.genero && !datosTipo.tipo ? "SIN GENERO / TIPO" : (!datosTipo.genero ? "SIN GENERO" : "SIN TIPO")
+            });
+          } else {
+            resultadoFormatoRial.push(filaRial);
+          }
+        });
+
+        actualizarMetricasGenerar({
+          reporte: reporteNormalizado.length,
+          formato: resultadoFormatoRial.length,
+          yaTrabajado: resultadoYaTrabajado.length,
+          sinTipo: resultadoSinTipo.length
+        });
+
+        activarDescargasGenerar();
+
+        vistaGenerar = "formato";
+        document.querySelectorAll("[data-generar-view]").forEach((t) => t.classList.remove("active"));
+        document.querySelector('[data-generar-view="formato"]').classList.add("active");
+        renderVistaGenerar();
+
+        showMessage("msgGenerar", "ok", "Archivo generado.");
+      } catch (error) {
+        console.error(error);
+        showMessage("msgGenerar", "error", "Error al generar.");
+      } finally {
+        $("btnGenerar").disabled = reporteRows.length === 0;
+      }
+    }
+
+    function debeQuedarPendienteInterno(row) {
+      if (row.ambientado !== "") return !esValorUno(row.ambientado);
+      if (row.fotosIa !== "") return !esValorTrue(row.fotosIa);
+      return true;
+    }
+
+    function obtenerGeneroTipo(row, mapaSubclases) {
+      const porSubclase = mapaSubclases.get(row.subclase);
+      if (porSubclase) {
+        return {
+          genero: limpiarTexto(porSubclase.GENERO),
+          tipo: limpiarTexto(porSubclase.TIPO)
+        };
+      }
+      return { genero: inferirGenero(row), tipo: inferirTipo(row) };
+    }
+
+    function inferirGenero(row) {
+      const texto = normalizarTextoBusqueda(`${row.descripcion} ${row.subclase}`);
+      if (texto.includes("NINA") || texto.includes("NIÑA")) return "NIÑA";
+      if (texto.includes("NINO") || texto.includes("NIÑO")) return "NIÑO";
+      if (lineaActiva === "hombre") return "HOMBRE";
+      if (lineaActiva === "mujer") return "MUJER";
       return "";
     }
 
-    async function refrescarBase(){ const items=await getAllByLinea("rial"); $("mBaseTotal").textContent=items.length.toLocaleString("es-CL"); $("subtitleBase").textContent=items.length.toLocaleString("es-CL")+" SKU"; renderTabla("tableBase","emptyBase","noteBase",items.map(function(item){ return {SKU:item.sku,MARCA:item.marca,GENERO:item.genero,TIPO:item.tipo,ESTADO:item.estado,FECHA_ENVIO:item.fechaEnvio}; })); }
-    async function refrescarSubclases(){ const items=await getAllByLinea("subclases"); $("mSubclasesTotal").textContent=items.length.toLocaleString("es-CL"); $("subtitleSubclases").textContent=items.length.toLocaleString("es-CL")+" subclases"; renderTabla("tableSubclases","emptySubclases","noteSubclases",items.map(function(item){ return {SUBCLASE:item.subclase,GENERO:item.genero,TIPO:item.tipo,TIPO_ORIGINAL:item.tipoOriginal || ""}; })); }
-    function renderVistaGenerar(){ let data=[],title=""; if(vistaGenerar==="formato"){data=resultadoFormatoRial; title="Formato RIAL";} if(vistaGenerar==="yaTrabajado"){data=resultadoYaTrabajado; title="Ya trabajado";} if(vistaGenerar==="sinTipo"){data=resultadoSinTipo; title="Sin tipo/género";} $("titleGenerar").textContent=title; $("subtitleGenerar").textContent=data.length.toLocaleString("es-CL")+" filas"; renderTabla("tableGenerar","emptyGenerar","noteGenerar",data); }
-    function renderTabla(tableId,emptyId,noteId,data){ const tableContainer=$(tableId), empty=$(emptyId), note=$(noteId); if(!data || data.length===0){ tableContainer.classList.add("hidden"); tableContainer.innerHTML=""; empty.classList.remove("hidden"); note.textContent="Vista previa: máximo 500 filas."; return; } tableContainer.classList.remove("hidden"); empty.classList.add("hidden"); const dataLimitada=data.slice(0,500); const headers=obtenerHeaders(dataLimitada); let html="<table><thead><tr>"; headers.forEach(function(header){ html += "<th>"+escapeHtml(header)+"</th>"; }); html += "</tr></thead><tbody>"; dataLimitada.forEach(function(row){ html += "<tr>"; headers.forEach(function(header){ html += "<td>"+renderCell(row[header],header)+"</td>"; }); html += "</tr>"; }); html += "</tbody></table>"; tableContainer.innerHTML=html; note.textContent = data.length>500 ? "Mostrando 500 de "+data.length.toLocaleString("es-CL")+"." : data.length.toLocaleString("es-CL")+" filas."; }
-    function renderCell(value,header){ const text=String(value || ""); if(header==="ESTADO_CRUCE") return "<span class=\"badge badge-blue\">"+escapeHtml(text)+"</span>"; if(header==="MOTIVO") return "<span class=\"badge badge-amber\">"+escapeHtml(text)+"</span>"; return escapeHtml(text); }
-    function actualizarMetricasGenerar(data){ $("mReporte").textContent=data.reporte.toLocaleString("es-CL"); $("mFormatoRial").textContent=data.formato.toLocaleString("es-CL"); $("mYaTrabajado").textContent=data.yaTrabajado.toLocaleString("es-CL"); $("mSinTipo").textContent=data.sinTipo.toLocaleString("es-CL"); }
-    function activarDescargasGenerar(){ $("btnDescargarFormato").disabled=resultadoFormatoRial.length===0; $("btnDescargarYaTrabajado").disabled=resultadoYaTrabajado.length===0; $("btnDescargarSinTipo").disabled=resultadoSinTipo.length===0; }
-    function limpiarGenerar(showMsg){ reporteRows=[]; resultadoFormatoRial=[]; resultadoYaTrabajado=[]; resultadoSinTipo=[]; $("fileReporte").value=""; $("boxReporte").classList.remove("loaded"); $("badgeReporte").className="upload-status badge badge-gray"; $("badgeReporte").textContent="Pendiente"; $("nameReporte").textContent="CSV / XLS / XLSX"; $("btnGenerar").disabled=true; actualizarMetricasGenerar({reporte:0,formato:0,yaTrabajado:0,sinTipo:0}); activarDescargasGenerar(); $("titleGenerar").textContent="Resultado"; $("subtitleGenerar").textContent="Sin datos."; renderTabla("tableGenerar","emptyGenerar","noteGenerar",[]); if(showMsg) showMessage("msgGenerar","ok","Limpio."); }
-    function limpiarRial(showMsg){ rialRows=[]; $("fileRial").value=""; $("boxRial").classList.remove("loaded"); $("badgeRial").className="upload-status badge badge-gray"; $("badgeRial").textContent="Pendiente"; $("nameRial").textContent="CSV / XLS / XLSX"; $("btnActualizarBase").disabled=true; $("mBaseNuevos").textContent="0"; $("mBaseActualizados").textContent="0"; if(showMsg) showMessage("msgRial","ok","Limpio."); }
-    function limpiarSubclases(showMsg){ subclasesRows=[]; $("fileSubclases").value=""; $("boxSubclases").classList.remove("loaded"); $("badgeSubclases").className="upload-status badge badge-gray"; $("badgeSubclases").textContent="Pendiente"; $("nameSubclases").textContent="CSV / XLS / XLSX"; $("btnActualizarSubclases").disabled=true; $("mSubclasesNuevas").textContent="0"; $("mSubclasesActualizadas").textContent="0"; if(showMsg) showMessage("msgSubclases","ok","Limpio."); }
-    async function exportarBaseRial(){ const items=await getAllByLinea("rial"); descargarExcel(items.map(function(item){ return {SKU:item.sku,MARCA:item.marca,GENERO:item.genero,TIPO:item.tipo,ESTADO:item.estado,FECHA_ENVIO:item.fechaEnvio,LINEA:item.linea}; }),"base_rial_"+lineaActiva); }
-    async function exportarSubclases(){ const items=await getAllByLinea("subclases"); descargarExcel(items.map(function(item){ return {SUBCLASE:item.subclase,GENERO:item.genero,TIPO:item.tipo,TIPO_ORIGINAL:item.tipoOriginal || "",LINEA:item.linea}; }),"subclases_"+lineaActiva); }
-    async function borrarBaseRial(){ if(!confirm("¿Borrar base RIAL de "+lineaActiva.toUpperCase()+"?")) return; await deleteByLinea("rial"); await refrescarBase(); $("mBaseNuevos").textContent="0"; $("mBaseActualizados").textContent="0"; showMessage("msgRial","ok","Base borrada."); }
-    async function borrarSubclases(){ if(!confirm("¿Borrar subclases de "+lineaActiva.toUpperCase()+"?")) return; await deleteByLinea("subclases"); await refrescarSubclases(); $("mSubclasesNuevas").textContent="0"; $("mSubclasesActualizadas").textContent="0"; showMessage("msgSubclases","ok","Subclases borradas."); }
+    function inferirTipo(row) {
+      const texto = normalizarTextoBusqueda(`${row.descripcion} ${row.subclase}`);
+      if (texto.includes("JEAN") || texto.includes("PANTALON") || texto.includes("PANTALÓN") || texto.includes("SHORT") || texto.includes("BERMUDA") || texto.includes("FALDA") || texto.includes("CALZA") || texto.includes("LEGGING") || texto.includes("BUZO")) return "TRONCO INFERIOR";
+      if (texto.includes("POLERA") || texto.includes("CAMISA") || texto.includes("BLUSA") || texto.includes("SWEATER") || texto.includes("CHAQUETA") || texto.includes("PARKA") || texto.includes("POLERON") || texto.includes("POLERÓN") || texto.includes("CHOMBA") || texto.includes("TOP")) return "TRONCO SUPERIOR";
+      if (texto.includes("ZAPATO") || texto.includes("ZAPATILLA") || texto.includes("BOTA") || texto.includes("SANDALIA")) return "CALZADO";
+      if (texto.includes("VESTIDO") || texto.includes("ENTERITO") || texto.includes("CONJUNTO")) return "CUERPO COMPLETO";
+      return "";
+    }
 
-    function detectarColumnasReporte(rows){ const headers=obtenerHeaders(rows); return {sku:buscarHeader(headers,["sku","id sku","id_sku","sku hijo","skuhijo"]),marca:buscarHeader(headers,["marca","brand"]),modeloColor:buscarHeader(headers,["modelo_color","modelo color","modelocolor","modelo-color"]),subclase:buscarHeader(headers,["subclase","sub clase","sub_class"]),descripcion:buscarHeader(headers,["descripcion","descripción","description"]),ambientado:buscarHeader(headers,["ambientado","foto ambientada","foto_ambientada"]),fotosIa:buscarHeader(headers,["fotosia","fotos ia","foto ia","fotoai"])}; }
-    function detectarColumnasRial(rows){ const headers=obtenerHeaders(rows); return {sku:buscarHeader(headers,["sku","id sku","id_sku"]),tipo:buscarHeader(headers,["tipo prenda sku","tipo","tipo prenda"]),marca:buscarHeader(headers,["marca","brand"]),genero:buscarHeader(headers,["genero","género","gender"]),estado:buscarHeader(headers,["estado","status"]),fechaEnvio:buscarHeader(headers,["fecha de envio","fecha de envío","fecha envio","fecha envío"])}; }
-    function detectarColumnasSubclases(rows){ const headers=obtenerHeaders(rows); return {subclase:buscarHeader(headers,["subclase","sub clase","sub_class"]),genero:buscarHeader(headers,["genero","género","gender"]),tipo:buscarHeader(headers,["tipo rial","tipo","tipo prenda","tipo prenda sku","subclase5","subclase 5"])}; }
-    function obtenerHeaders(rows){ const set=new Set(); rows.forEach(function(row){ Object.keys(row).forEach(function(key){ set.add(key); }); }); return Array.from(set); }
-    function buscarHeader(headers,candidates){ const normalizados=headers.map(function(header){ return {original:header,normalizado:normalizarHeader(header)}; }); const candidatosNormalizados=candidates.map(function(c){ return normalizarHeader(c); }); for(const candidato of candidatosNormalizados){ const exacto=normalizados.find(function(h){ return h.normalizado===candidato; }); if(exacto) return exacto.original; } for(const candidato of candidatosNormalizados){ const parcial=normalizados.find(function(h){ return h.normalizado.includes(candidato); }); if(parcial) return parcial.original; } return null; }
-    function normalizarHeader(value){ return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[%]/g,"").replace(/[^a-z0-9]/g,""); }
-    function normalizarSku(value){ let sku=String(value || "").trim(); if(sku==="") return ""; sku=sku.replace(/\s+/g,"").replace(/\.0$/,""); return sku; }
-    function normalizarValor(value){ return String(value || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(",",".").replace(/\s+/g,""); }
-    function normalizarModeloColor(value){ return String(value || "").trim().toUpperCase().replace(/\s+/g," "); }
-    function normalizarSubclase(value){ return String(value || "").trim().toUpperCase().replace(/\s+/g,""); }
-    function normalizarTextoBusqueda(value){ return String(value || "").trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
-    function limpiarTexto(value){ return String(value || "").trim(); }
-    function esValorUno(value){ const limpio=normalizarValor(value); return limpio==="1" || limpio==="1.0" || limpio==="si" || limpio==="true"; }
-    function esValorTrue(value){ const limpio=normalizarValor(value); return limpio==="true" || limpio==="1" || limpio==="si" || limpio==="s"; }
-    function crearId(linea,key){ return linea+"|"+String(key).trim().toUpperCase(); }
-    function descargarExcel(data,nombreBase){ if(!data || data.length===0){ showMessage("msgGenerar","warn","Sin datos."); return; } const workbook=XLSX.utils.book_new(); const worksheet=XLSX.utils.json_to_sheet(data); XLSX.utils.book_append_sheet(workbook,worksheet,"Resultado"); const fecha=obtenerFechaArchivo(); XLSX.writeFile(workbook,nombreBase+"_"+fecha+".xlsx"); }
-    function obtenerFechaArchivo(){ const now=new Date(); const pad=function(n){ return String(n).padStart(2,"0"); }; return now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+"_"+pad(now.getHours())+pad(now.getMinutes()); }
-    function showMessage(id,type,text){ const box=$(id); box.className="message show "+type; box.textContent=text; }
-    function escapeHtml(value){ return String(value || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+    async function refrescarBase() {
+      const items = await getCollectionData(collectionName("rial"));
+      $("mBaseTotal").textContent = items.length.toLocaleString("es-CL");
+      $("subtitleBase").textContent = `${items.length.toLocaleString("es-CL")} SKU`;
+      renderTabla("tableBase", "emptyBase", "noteBase", items.map((item) => ({
+        SKU: item.SKU,
+        MARCA: item.MARCA,
+        GENERO: item.GENERO,
+        TIPO: item.TIPO,
+        ESTADO: item.ESTADO,
+        FECHA_ENVIO: item.FECHA_ENVIO
+      })));
+    }
+
+    async function refrescarSubclases() {
+      const items = await getCollectionData(collectionName("subclases"));
+      $("mSubclasesTotal").textContent = items.length.toLocaleString("es-CL");
+      $("subtitleSubclases").textContent = `${items.length.toLocaleString("es-CL")} subclases`;
+      renderTabla("tableSubclases", "emptySubclases", "noteSubclases", items.map((item) => ({
+        SUBCLASE: item.SUBCLASE,
+        GENERO: item.GENERO,
+        TIPO: item.TIPO
+      })));
+    }
+
+    function renderVistaGenerar() {
+      let data = [];
+      let title = "";
+
+      if (vistaGenerar === "formato") { data = resultadoFormatoRial; title = "Formato RIAL"; }
+      if (vistaGenerar === "yaTrabajado") { data = resultadoYaTrabajado; title = "Ya trabajado"; }
+      if (vistaGenerar === "sinTipo") { data = resultadoSinTipo; title = "Sin tipo/género"; }
+
+      $("titleGenerar").textContent = title;
+      $("subtitleGenerar").textContent = `${data.length.toLocaleString("es-CL")} filas`;
+      renderTabla("tableGenerar", "emptyGenerar", "noteGenerar", data);
+    }
+
+    function renderTabla(tableId, emptyId, noteId, data) {
+      const tableContainer = $(tableId);
+      const empty = $(emptyId);
+      const note = $(noteId);
+
+      if (!data || data.length === 0) {
+        tableContainer.classList.add("hidden");
+        tableContainer.innerHTML = "";
+        empty.classList.remove("hidden");
+        note.textContent = "Vista previa: máximo 500 filas.";
+        return;
+      }
+
+      tableContainer.classList.remove("hidden");
+      empty.classList.add("hidden");
+
+      const dataLimitada = data.slice(0, 500);
+      const headers = obtenerHeaders(dataLimitada);
+
+      let html = "<table><thead><tr>";
+      headers.forEach((header) => { html += `<th>${escapeHtml(header)}</th>`; });
+      html += "</tr></thead><tbody>";
+
+      dataLimitada.forEach((row) => {
+        html += "<tr>";
+        headers.forEach((header) => { html += `<td>${renderCell(row[header], header)}</td>`; });
+        html += "</tr>";
+      });
+
+      html += "</tbody></table>";
+      tableContainer.innerHTML = html;
+
+      if (data.length > 500) note.textContent = `Mostrando 500 de ${data.length.toLocaleString("es-CL")}.`;
+      else note.textContent = `${data.length.toLocaleString("es-CL")} filas.`;
+    }
+
+    function renderCell(value, header) {
+      const text = String(value ?? "");
+      if (header === "ESTADO_CRUCE" && text.includes("YA TRABAJADO")) return `<span class="badge badge-blue">${escapeHtml(text)}</span>`;
+      if (header === "MOTIVO") return `<span class="badge badge-amber">${escapeHtml(text)}</span>`;
+      return escapeHtml(text);
+    }
+
+    function actualizarMetricasGenerar(data) {
+      $("mReporte").textContent = data.reporte.toLocaleString("es-CL");
+      $("mFormatoRial").textContent = data.formato.toLocaleString("es-CL");
+      $("mYaTrabajado").textContent = data.yaTrabajado.toLocaleString("es-CL");
+      $("mSinTipo").textContent = data.sinTipo.toLocaleString("es-CL");
+    }
+
+    function activarDescargasGenerar() {
+      $("btnDescargarFormato").disabled = resultadoFormatoRial.length === 0;
+      $("btnDescargarYaTrabajado").disabled = resultadoYaTrabajado.length === 0;
+      $("btnDescargarSinTipo").disabled = resultadoSinTipo.length === 0;
+    }
+
+    function limpiarGenerar(showMsg) {
+      reporteRows = [];
+      resultadoFormatoRial = [];
+      resultadoYaTrabajado = [];
+      resultadoSinTipo = [];
+      $("fileReporte").value = "";
+      $("boxReporte").classList.remove("loaded");
+      $("badgeReporte").className = "upload-status badge badge-gray";
+      $("badgeReporte").textContent = "Pendiente";
+      $("nameReporte").textContent = "CSV / XLS / XLSX";
+      $("btnGenerar").disabled = true;
+      actualizarMetricasGenerar({ reporte: 0, formato: 0, yaTrabajado: 0, sinTipo: 0 });
+      activarDescargasGenerar();
+      $("titleGenerar").textContent = "Resultado";
+      $("subtitleGenerar").textContent = "Sin datos.";
+      renderTabla("tableGenerar", "emptyGenerar", "noteGenerar", []);
+      if (showMsg) showMessage("msgGenerar", "ok", "Limpio.");
+    }
+
+    function limpiarRial(showMsg) {
+      rialRows = [];
+      $("fileRial").value = "";
+      $("boxRial").classList.remove("loaded");
+      $("badgeRial").className = "upload-status badge badge-gray";
+      $("badgeRial").textContent = "Pendiente";
+      $("nameRial").textContent = "CSV / XLS / XLSX";
+      $("btnActualizarBase").disabled = true;
+      $("mBaseNuevos").textContent = "0";
+      $("mBaseActualizados").textContent = "0";
+      if (showMsg) showMessage("msgRial", "ok", "Limpio.");
+    }
+
+    function limpiarSubclases(showMsg) {
+      subclasesRows = [];
+      $("fileSubclases").value = "";
+      $("boxSubclases").classList.remove("loaded");
+      $("badgeSubclases").className = "upload-status badge badge-gray";
+      $("badgeSubclases").textContent = "Pendiente";
+      $("nameSubclases").textContent = "CSV / XLS / XLSX";
+      $("btnActualizarSubclases").disabled = true;
+      $("mSubclasesNuevas").textContent = "0";
+      $("mSubclasesActualizadas").textContent = "0";
+      if (showMsg) showMessage("msgSubclases", "ok", "Limpio.");
+    }
+
+    async function exportarBaseRial() {
+      const items = await getCollectionData(collectionName("rial"));
+      descargarExcel(items.map((item) => ({
+        SKU: item.SKU,
+        MARCA: item.MARCA,
+        GENERO: item.GENERO,
+        TIPO: item.TIPO,
+        ESTADO: item.ESTADO,
+        FECHA_ENVIO: item.FECHA_ENVIO,
+        LINEA: item.LINEA
+      })), `base_rial_${lineaActiva}`);
+    }
+
+    async function exportarSubclases() {
+      const items = await getCollectionData(collectionName("subclases"));
+      descargarExcel(items.map((item) => ({
+        SUBCLASE: item.SUBCLASE,
+        GENERO: item.GENERO,
+        TIPO: item.TIPO,
+        LINEA: item.LINEA
+      })), `subclases_${lineaActiva}`);
+    }
+
+    async function borrarBaseRial() {
+      const ok = confirm(`¿Borrar base RIAL de ${lineaActiva.toUpperCase()}?`);
+      if (!ok) return;
+      await deleteCollection(collectionName("rial"));
+      await refrescarBase();
+      $("mBaseNuevos").textContent = "0";
+      $("mBaseActualizados").textContent = "0";
+      showMessage("msgRial", "ok", "Base borrada.");
+    }
+
+    async function borrarSubclases() {
+      const ok = confirm(`¿Borrar subclases de ${lineaActiva.toUpperCase()}?`);
+      if (!ok) return;
+      await deleteCollection(collectionName("subclases"));
+      await refrescarSubclases();
+      $("mSubclasesNuevas").textContent = "0";
+      $("mSubclasesActualizadas").textContent = "0";
+      showMessage("msgSubclases", "ok", "Subclases borradas.");
+    }
+
+    async function deleteCollection(collName) {
+      const snapshot = await getDocs(collection(db, collName));
+      const docs = snapshot.docs;
+      const chunkSize = 450;
+      for (let i = 0; i < docs.length; i += chunkSize) {
+        const batch = writeBatch(db);
+        docs.slice(i, i + chunkSize).forEach((docSnap) => batch.delete(doc(db, collName, docSnap.id)));
+        await batch.commit();
+      }
+    }
+
+    function detectarColumnasReporte(rows) {
+      const headers = obtenerHeaders(rows);
+      return {
+        sku: buscarHeader(headers, ["sku", "id sku", "id_sku", "sku hijo", "skuhijo"]),
+        marca: buscarHeader(headers, ["marca", "brand"]),
+        modeloColor: buscarHeader(headers, ["modelo_color", "modelo color", "modelocolor", "modelo-color"]),
+        subclase: buscarHeader(headers, ["subclase", "sub clase", "sub_class"]),
+        descripcion: buscarHeader(headers, ["descripcion", "descripción", "description"]),
+        ambientado: buscarHeader(headers, ["ambientado", "foto ambientada", "foto_ambientada"]),
+        fotosIa: buscarHeader(headers, ["fotosia", "fotos ia", "foto ia", "fotoai"])
+      };
+    }
+
+    function detectarColumnasRial(rows) {
+      const headers = obtenerHeaders(rows);
+      return {
+        sku: buscarHeader(headers, ["sku", "id sku", "id_sku"]),
+        tipo: buscarHeader(headers, ["tipo prenda sku", "tipo", "tipo prenda"]),
+        marca: buscarHeader(headers, ["marca", "brand"]),
+        genero: buscarHeader(headers, ["genero", "género", "gender"]),
+        estado: buscarHeader(headers, ["estado", "status"]),
+        fechaEnvio: buscarHeader(headers, ["fecha de envio", "fecha de envío", "fecha envio", "fecha envío"])
+      };
+    }
+
+    function detectarColumnasSubclases(rows) {
+      const headers = obtenerHeaders(rows);
+      return {
+        subclase: buscarHeader(headers, ["subclase", "sub clase", "sub_class"]),
+        genero: buscarHeader(headers, ["genero", "género", "gender"]),
+        tipo: buscarHeader(headers, ["tipo", "tipo prenda", "tipo prenda sku"])
+      };
+    }
+
+    function obtenerHeaders(rows) {
+      const set = new Set();
+      rows.forEach((row) => Object.keys(row).forEach((key) => set.add(key)));
+      return Array.from(set);
+    }
+
+    function buscarHeader(headers, candidates) {
+      const normalizados = headers.map((header) => ({ original: header, normalizado: normalizarHeader(header) }));
+      const candidatosNormalizados = candidates.map((c) => normalizarHeader(c));
+
+      for (const candidato of candidatosNormalizados) {
+        const exacto = normalizados.find((h) => h.normalizado === candidato);
+        if (exacto) return exacto.original;
+      }
+
+      for (const candidato of candidatosNormalizados) {
+        const parcial = normalizados.find((h) => h.normalizado.includes(candidato));
+        if (parcial) return parcial.original;
+      }
+
+      return null;
+    }
+
+    function normalizarHeader(value) {
+      return String(value ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[%]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function normalizarSku(value) {
+      let sku = String(value ?? "").trim();
+      if (sku === "") return "";
+      sku = sku.replace(/\s+/g, "").replace(/\.0$/, "");
+      return sku;
+    }
+
+    function normalizarValor(value) {
+      return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(",", ".")
+        .replace(/\s+/g, "");
+    }
+
+    function normalizarModeloColor(value) {
+      return String(value ?? "").trim().toUpperCase().replace(/\s+/g, " ");
+    }
+
+    function normalizarSubclase(value) {
+      return String(value ?? "").trim().toUpperCase().replace(/\s+/g, "");
+    }
+
+    function normalizarTextoBusqueda(value) {
+      return String(value ?? "")
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function limpiarTexto(value) {
+      return String(value ?? "").trim();
+    }
+
+    function esValorUno(value) {
+      const limpio = normalizarValor(value);
+      return limpio === "1" || limpio === "1.0" || limpio === "si" || limpio === "true";
+    }
+
+    function esValorTrue(value) {
+      const limpio = normalizarValor(value);
+      return limpio === "true" || limpio === "1" || limpio === "si" || limpio === "s";
+    }
+
+    function descargarExcel(data, nombreBase) {
+      if (!data || data.length === 0) return;
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Resultado");
+      const fecha = obtenerFechaArchivo();
+      XLSX.writeFile(workbook, `${nombreBase}_${fecha}.xlsx`);
+    }
+
+    function obtenerFechaArchivo() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    }
+
+    function showMessage(id, type, text) {
+      const box = $(id);
+      box.className = `message show ${type}`;
+      box.textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
   </script>
 </body>
 </html>
