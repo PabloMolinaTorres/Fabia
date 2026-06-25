@@ -629,7 +629,7 @@
       <div class="brand-icon">F</div>
       <div>
         Fabia
-        <small>Firestore · Base RIAL</small>
+        <small>Firestore · Base compartida</small>
       </div>
     </div>
 
@@ -698,9 +698,7 @@
                         <p id="subtitleGenerar">Sin datos.</p>
                       </div>
                       <div class="download-actions">
-                        <button class="btn-green" id="btnDescargarFormato" disabled>Formato RIAL</button>
-                        <button class="btn-light" id="btnDescargarYaTrabajado" disabled>Ya trabajado</button>
-                        <button class="btn-light" id="btnDescargarSinTipo" disabled>Sin tipo/género</button>
+                        <button class="btn-green" id="btnDescargarVista" disabled>Descargar</button>
                       </div>
                     </div>
 
@@ -913,6 +911,7 @@
           tab.classList.add("active");
           vistaGenerar = tab.dataset.generarView;
           renderVistaGenerar();
+          activarDescargasGenerar();
         });
       });
 
@@ -933,9 +932,7 @@
       $("btnExportarSubclases").addEventListener("click", exportarSubclases);
       $("btnBorrarSubclases").addEventListener("click", borrarSubclases);
 
-      $("btnDescargarFormato").addEventListener("click", () => descargarExcel(resultadoFormatoRial, "formato_rial"));
-      $("btnDescargarYaTrabajado").addEventListener("click", () => descargarExcel(resultadoYaTrabajado, "ya_trabajado_rial"));
-      $("btnDescargarSinTipo").addEventListener("click", () => descargarExcel(resultadoSinTipo, "sin_tipo_genero"));
+      $("btnDescargarVista").addEventListener("click", descargarVistaActual);
     }
 
     function mostrarModulo(moduleName) {
@@ -1092,7 +1089,7 @@
     }
 
     function collectionName(base) {
-      return `${base}_${lineaActiva}`;
+      return base;
     }
 
     function safeDocId(value) {
@@ -1463,9 +1460,26 @@
     }
 
     function activarDescargasGenerar() {
-      $("btnDescargarFormato").disabled = resultadoFormatoRial.length === 0;
-      $("btnDescargarYaTrabajado").disabled = resultadoYaTrabajado.length === 0;
-      $("btnDescargarSinTipo").disabled = resultadoSinTipo.length === 0;
+      const data = getDataVistaActual();
+      $("btnDescargarVista").disabled = data.length === 0;
+    }
+
+    function getDataVistaActual() {
+      if (vistaGenerar === "formato") return resultadoFormatoRial;
+      if (vistaGenerar === "yaTrabajado") return resultadoYaTrabajado;
+      if (vistaGenerar === "sinTipo") return resultadoSinTipo;
+      return [];
+    }
+
+    function getNombreVistaActual() {
+      if (vistaGenerar === "formato") return "formato_rial";
+      if (vistaGenerar === "yaTrabajado") return "ya_trabajado_rial";
+      if (vistaGenerar === "sinTipo") return "sin_tipo_genero";
+      return "resultado";
+    }
+
+    function descargarVistaActual() {
+      descargarExcel(getDataVistaActual(), getNombreVistaActual());
     }
 
     function limpiarGenerar(showMsg) {
@@ -1523,7 +1537,7 @@
         ESTADO: item.ESTADO,
         FECHA_ENVIO: item.FECHA_ENVIO,
         LINEA: item.LINEA
-      })), `base_rial_${lineaActiva}`);
+      })), `base_rial`);
     }
 
     async function exportarSubclases() {
@@ -1533,11 +1547,11 @@
         GENERO: item.GENERO,
         TIPO: item.TIPO,
         LINEA: item.LINEA
-      })), `subclases_${lineaActiva}`);
+      })), `subclases`);
     }
 
     async function borrarBaseRial() {
-      const ok = confirm(`¿Borrar base RIAL de ${lineaActiva.toUpperCase()}?`);
+      const ok = confirm(`¿Borrar base RIAL completa?`);
       if (!ok) return;
       await deleteCollection(collectionName("rial"));
       await refrescarBase();
@@ -1547,7 +1561,7 @@
     }
 
     async function borrarSubclases() {
-      const ok = confirm(`¿Borrar subclases de ${lineaActiva.toUpperCase()}?`);
+      const ok = confirm(`¿Borrar subclases completas?`);
       if (!ok) return;
       await deleteCollection(collectionName("subclases"));
       await refrescarSubclases();
