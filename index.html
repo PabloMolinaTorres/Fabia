@@ -634,7 +634,7 @@
     </div>
 
     <div class="header-actions">
-      <div class="version">V2.2 Firestore</div>
+      <div class="version" id="firebaseStatus">V2.3 Firestore</div>
       <button class="theme-toggle" id="themeToggle" title="Cambiar modo">🌙</button>
     </div>
   </header>
@@ -874,8 +874,15 @@
     configurarDragDrop("boxSubclases", "fileSubclases");
 
     (async () => {
-      await refrescarBase();
-      await refrescarSubclases();
+      try {
+        await refrescarBase();
+        await refrescarSubclases();
+        $("firebaseStatus").textContent = "V2.3 Firestore OK";
+      } catch (error) {
+        console.error(error);
+        $("firebaseStatus").textContent = "Firestore ERROR";
+        alert("Firestore no está conectado: " + obtenerDetalleError(error));
+      }
     })();
 
     function prepararEventos() {
@@ -1147,10 +1154,11 @@
         $("mBaseNuevos").textContent = nuevos.toLocaleString("es-CL");
         $("mBaseActualizados").textContent = actualizados.toLocaleString("es-CL");
         await refrescarBase();
-        showMessage("msgRial", "ok", "Base actualizada.");
+        const totalFirestore = await contarDocumentos("rial");
+        showMessage("msgRial", "ok", `Base guardada en Firestore. Total: ${totalFirestore.toLocaleString("es-CL")} SKU.`);
       } catch (error) {
         console.error(error);
-        showMessage("msgRial", "error", "Error al actualizar base.");
+        showMessage("msgRial", "error", "Firestore: " + obtenerDetalleError(error));
       } finally {
         $("btnActualizarBase").disabled = rialRows.length === 0;
       }
@@ -1207,7 +1215,7 @@
         showMessage("msgSubclases", "ok", "Subclases actualizadas.");
       } catch (error) {
         console.error(error);
-        showMessage("msgSubclases", "error", "Error al actualizar subclases.");
+        showMessage("msgSubclases", "error", "Firestore: " + obtenerDetalleError(error));
       } finally {
         $("btnActualizarSubclases").disabled = subclasesRows.length === 0;
       }
@@ -1216,6 +1224,17 @@
     async function obtenerSetIds(collName) {
       const snapshot = await getDocs(collection(db, collName));
       return new Set(snapshot.docs.map((d) => d.id));
+    }
+
+    async function contarDocumentos(collName) {
+      const snapshot = await getDocs(collection(db, collName));
+      return snapshot.size;
+    }
+
+    function obtenerDetalleError(error) {
+      const code = error && error.code ? error.code : "";
+      const message = error && error.message ? error.message : String(error || "Error desconocido");
+      return `${code} ${message}`.trim();
     }
 
     async function batchSet(collName, items) {
@@ -1330,7 +1349,7 @@
         showMessage("msgGenerar", "ok", "Archivo generado.");
       } catch (error) {
         console.error(error);
-        showMessage("msgGenerar", "error", "Error al generar.");
+        showMessage("msgGenerar", "error", "Firestore: " + obtenerDetalleError(error));
       } finally {
         $("btnGenerar").disabled = reporteRows.length === 0;
       }
